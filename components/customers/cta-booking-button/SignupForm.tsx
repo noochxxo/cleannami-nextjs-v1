@@ -18,6 +18,7 @@ import { ModalLayout } from "./ModalLayout";
 import { ProgressBar } from "./ProgressBar";
 import { PriceSummary } from "./PriceSummary";
 import { completeOnboarding } from "@/lib/actions/onboarding.actions";
+import { cn } from "@/lib/utils";
 
 const stepFields: Record<number, string[]> = {
   1: ["name", "email", "emailConfirm", "phoneNumber"],
@@ -64,7 +65,7 @@ export const SignupForm = ({ isOpen, onClose }: Props) => {
     hotTubDrainCadence: undefined,
     subscriptionMonths: 6,
     iCalUrl: "",
-    // @ts-expect-error: null is needed to prevent calendar from proceeding on invlid input
+    // @ts-expect-error: null is needed to prevent calendar from proceeding on invlid options
     firstCleanDate: null,
   });
   const [priceDetails, setPriceDetails] = useState<PriceDetails | null>(null);
@@ -205,22 +206,22 @@ export const SignupForm = ({ isOpen, onClose }: Props) => {
 
       <div>
         <div className="min-h-[350px]">{renderStep()}</div>
-        {!isConfirmation && (
+        
           <div className="mt-8 pt-5 border-t">
             <div className="flex justify-between">
               {/* Not visibl for some reasone */}
-              <button
+                <button
                 type="button"
                 onClick={prevStep}
                 disabled={currentStep === 1}
-                style={{ visibility: currentStep === 1 ? "hidden" : "visible" }}
-                className="py-2 px-4 border  rounded-md text-sm font-medium hover:bg-gray-50"
+                className={cn("py-2 px-4 rounded-md text-sm font-medium text-white bg-teal-600 hover:bg-teal-700", currentStep === 1 ? 'invisible': 'visible')}
               >
                 Back
               </button>
+              
 
               {/* NEXT BUTTON: Only visible on steps before payment */}
-              {currentStep < 7 && (
+              {!isConfirmation && currentStep < 7 && (
                 <button
                   type="button"
                   onClick={nextStep}
@@ -231,7 +232,7 @@ export const SignupForm = ({ isOpen, onClose }: Props) => {
               )}
             </div>
           </div>
-        )}
+        
       </div>
     </ModalLayout>
   );
