@@ -25,3 +25,11 @@ export {
   type Subscription,
   type NewSubscription,
 } from '@/db/schema';
+
+export {
+  insertUserSchema,
+  selectUserSchema,
+  updateUserSchema,
+  type User,
+  type NewUser,
+} from '@/db/schema';

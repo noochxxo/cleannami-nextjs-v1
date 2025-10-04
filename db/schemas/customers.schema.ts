@@ -6,6 +6,9 @@ export const customers = pgTable(
   "customers",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    // Uncomment below if you want to add customer authentication
+    // this links customer auth to their data
+    // supabaseUserId: uuid('supabase_user_id').notNull().unique(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     phone: text("phone_number"),

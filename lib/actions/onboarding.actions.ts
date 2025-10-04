@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicFormClient } from "@/lib/supabase/server";
 import {
   customers,
   properties,
@@ -88,7 +88,7 @@ export async function completeOnboarding(
       if (checklistFile && checklistFile.length > 0) {
         for (const file of checklistFile) {
           const storagePath = `checklists/${property.id}/${file.name}`;
-          const supabase = await createClient();
+          const supabase = await createPublicFormClient();
           const { error: uploadError } = await supabase.storage
             .from("checklists")
             .upload(storagePath, file);
