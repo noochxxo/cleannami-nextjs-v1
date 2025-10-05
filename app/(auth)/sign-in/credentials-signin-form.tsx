@@ -74,7 +74,7 @@ const CredentialsSignInForm = () => {
       </button>
 
       {data && !data.success && (
-        <div className="text-center text-red-7">{data.error.message}</div>
+        <div className="text-center text-red-700">{data.error.message}</div>
       )}
     </Form>
   );

@@ -28,6 +28,12 @@ export default function Layout({
             >
               About Us
             </Link>
+            <Link
+              href="/sign-in"
+              className="text-gray-600 hover:text-teal-500 font-medium transition-colors"
+            >
+              Sign in
+            </Link>
           </nav>
         </div>
       </header>

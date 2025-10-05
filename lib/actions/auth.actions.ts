@@ -59,6 +59,7 @@ export async function signUpUser(
   }
 
   const userRole = result.data?.user_metadata.role || "user";
+  console.log(userRole)
 
   if (userRole === "user") {
     revalidatePath("/customer/dashboard");
@@ -75,10 +76,11 @@ export async function signInUser(
   prevState: AuthUserForm | undefined,
   formData: FormData
 ) {
-  const validation = signUpFormSchema.safeParse({
+  const validation = signInFormSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
+
 
   if (!validation.success) {
     return {
@@ -87,7 +89,7 @@ export async function signInUser(
         email: formData.get("email") as string,
       },
       error: {
-        message: formatError(validation.error),
+        message: `validation: ${formatError(validation.error)}`,
       },
     };
   }
@@ -112,13 +114,14 @@ export async function signInUser(
   }
 
   const userRole = result.data?.user_metadata.role || "user";
+  console.log(userRole)
 
   if (userRole === "user") {
     revalidatePath("/customer/dashboard");
     return redirect("/customer/dashboard");
   }
 
-  if (userRole === "admin") {
+  if (userRole === "admin" || userRole === "super_admin") {
     revalidatePath("/admin/dashboard");
     return redirect("/admin/dashboard");
   }

@@ -48,11 +48,6 @@ export class AuthService {
         await this.supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: {
-              role: role,
-            },
-          },
         });
 
       if (authError) {

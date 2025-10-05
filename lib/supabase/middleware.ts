@@ -99,37 +99,17 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 3. CRITICAL: Redirect authenticated non-admin users from admin routes
+  if (user && isProtectedCustomerRoute && isAdmin) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/dashboard";
+    return NextResponse.redirect(url);
+  }
+
   if (user && isProtectedAdminRoute && !isAdmin) {
     const url = request.nextUrl.clone();
     url.pathname = "/customer/dashboard";
     return NextResponse.redirect(url);
   }
-  // if (isAdmin && !user && isProtectedAdminRoute) {
-  //   const url = request.nextUrl.clone();
-  //   url.pathname = "/admin/dashboard";
-  //   return NextResponse.redirect(url);
-  // }
-
-  // if (!user && isProtectedCustomerRoute  ) {
-  //   const url = request.nextUrl.clone();
-  //   url.pathname = "/customers/dashboard";
-  //   return NextResponse.redirect(url);
-  // }
-
-  // if (!user && isProtectedCustomerRoute ) {
-  //   const url = request.nextUrl.clone();
-  //   url.pathname = "/sign-in";
-  //   return NextResponse.redirect(url);
-  // }
-
-  // if (!user && isProtectedAdminRoute ) {
-  //   const url = request.nextUrl.clone();
-  //   url.pathname = "/sign-in";
-  //   return NextResponse.redirect(url);
-  // }
-
-  
 
   
 

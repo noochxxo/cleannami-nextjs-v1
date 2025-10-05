@@ -1,10 +1,11 @@
-import { pgTable, timestamp, uuid, varchar, index } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, uuid, varchar, index, text } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   supabaseUserId: uuid('supabase_user_id').notNull().unique(),
+  role: text('role').default('user').notNull(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }),
   createdAt: timestamp('created_at').notNull().defaultNow(),

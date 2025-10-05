@@ -10,6 +10,7 @@ import {
 } from "@/db/schema";
 import { SignupFormData, signupFormSchema } from "../validations/bookng-modal";
 import Stripe from 'stripe';
+import { ICalService } from "../services/iCal/ical.service";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -126,6 +127,25 @@ export async function completeOnboarding(
 
       return { customer, property, subscription };
     });
+
+    if (result.subscription && iCalUrl) {
+      console.log(`Onboarding successful. Triggering initial calendar sync for subscription: ${result.subscription.id}`);
+      try {
+        const icalService = new ICalService(db);
+        // We use the subscriptionId from the 'result' of our transaction.
+        await icalService.syncCalendar({ subscriptionId: result.subscription.id });
+        console.log("Initial calendar sync completed successfully.");
+      } catch (syncError) {
+        // IMPORTANT: We log the error, but we don't throw it.
+        // The main onboarding was successful, and a failed initial sync
+        // shouldn't tell the user that the whole process failed.
+        // This can be monitored and retried by a cron job later.
+        console.error(
+          `CRITICAL: Initial calendar sync failed for new subscription ${result.subscription.id}`,
+          syncError
+        );
+      }
+    }
 
     console.log("Successfully saved to database:", result);
     return { success: true, data: result };
