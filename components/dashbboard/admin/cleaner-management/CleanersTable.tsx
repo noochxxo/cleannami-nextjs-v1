@@ -2,9 +2,10 @@
 
 import { ChevronDownIcon, ChevronsUpDown, ChevronUpIcon, UserIcon } from "lucide-react";
 import { CleanersResponse } from "@/lib/queries/cleaners"; 
+import { formatDate } from "date-fns";
 
 // Define the shape of a single cleaner from our API response
-type Cleaner = CleanersResponse['cleaners'][number];
+type Cleaner = CleanersResponse['data'][number];
 
 // --- Helper Functions ---
 const getStatusBadge = (status: "available" | "unavailable" | "on_job" | string | null | undefined) => {
@@ -104,7 +105,7 @@ export const CleanersTable = ({ cleaners, sortConfig, onSort, onManageCleaner }:
                   </span>
                 </td>
                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(cleaner.createdAt).toLocaleDateString()}
+                  {formatDate(cleaner.createdAt, 'yyyy-MM-dd')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button

@@ -5,8 +5,8 @@ import { PropertiesWithOwner } from "@/lib/queries/properties";
 
 // Define the component's props
 interface PropertiesTableProps {
-  properties: PropertiesWithOwner['properties'];
-  onDelete: (property: PropertiesWithOwner['properties'][number]) => void;
+  properties: PropertiesWithOwner['data'];
+  onDelete: (property: PropertiesWithOwner['data'][number]) => void;
 }
 
 // NOTE: We are assuming `getStatusBadge` is a utility function you have defined elsewhere.

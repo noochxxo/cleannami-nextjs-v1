@@ -1,16 +1,19 @@
 'use client';
 
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useDebounce } from 'use-debounce';
 import { PropertiesTable } from '@/components/dashbboard/admin/properties/PropertiesTable';
 import { PropertiesWithOwner } from '@/lib/queries/properties';
 import { createClient } from '@/lib/supabase/client';
 import { ConfirmationModal } from '@/components/dashbboard/admin/ui/ConfirmationModal';
-import { TriangleAlertIcon } from 'lucide-react';
+import { TriangleAlertIcon, PlusIcon } from 'lucide-react';
+import { SearchBar } from '@/components/dashbboard/admin/ui/SearchBar';
 
-// Client-safe fetcher for infinite scrolling
-async function fetchProperties({ pageParam = 1 }: { pageParam?: number }) {
-  const res = await fetch(`/api/properties?page=${pageParam}`);
+// Updated fetcher to pass the search query
+async function fetchProperties({ pageParam = 1, queryKey }: { pageParam?: number, queryKey: any[] }) {
+  const [_, { search }] = queryKey;
+  const res = await fetch(`/api/properties?page=${pageParam}&query=${search}`);
   if (!res.ok) {
     throw new Error('Network response was not ok');
   }
@@ -20,62 +23,53 @@ async function fetchProperties({ pageParam = 1 }: { pageParam?: number }) {
 export const PropertiesPageClient = () => {
   const queryClient = useQueryClient();
   const [propertyToDelete, setPropertyToDelete] = useState<PropertiesWithOwner['properties'][number] | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
+  // The query key now includes the debounced search term
+  const queryKey = useMemo(() => ['properties', { search: debouncedSearchTerm }], [debouncedSearchTerm]);
 
   const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
+    data, error, fetchNextPage, hasNextPage, isFetchingNextPage, status,
   } = useInfiniteQuery({
-    queryKey: ['properties'],
+    queryKey,
     queryFn: fetchProperties,
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
 
-  // Set up real-time subscription
   useEffect(() => {
     const supabase = createClient();
-    const channel = supabase
-      .channel('realtime-properties')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'properties' },
-        (payload) => {
-          queryClient.invalidateQueries({ queryKey: ['properties'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    const channel = supabase.channel('realtime-properties')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' },
+        () => queryClient.invalidateQueries({ queryKey: ['properties'] })
+      ).subscribe();
+    return () => { supabase.removeChannel(channel) };
   }, [queryClient]);
   
   const handleDeleteProperty = async () => {
       if (!propertyToDelete) return;
-      // Here you would add your API call to delete the property
       console.log("Deleting property:", propertyToDelete.id);
-      // Example: await fetch(`/api/properties/${propertyToDelete.id}`, { method: 'DELETE' });
-      
-      // After deletion, invalidate the query to refetch the list
       queryClient.invalidateQueries({ queryKey: ['properties'] });
-      setPropertyToDelete(null); // Close modal
+      setPropertyToDelete(null);
   }
 
   const allProperties = data?.pages.flatMap(page => page.properties) ?? [];
-  const uniqueProperties = Array.from(new Map(allProperties.map(prop => [prop.id, prop])).values());
-
 
   return (
-    <div>
-        <PropertiesTable properties={uniqueProperties} onDelete={setPropertyToDelete} />
+     <div className="space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <SearchBar onSearch={setSearchTerm} placeholder="Search by address or owner..." />
+          <button className="w-full md:w-auto flex items-center justify-center bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600">
+            <PlusIcon className="mr-2 h-5 w-5" />
+            Add Property
+          </button>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <PropertiesTable properties={allProperties} onDelete={setPropertyToDelete} />
+        </div>
 
-        {/* Pagination Button */}
         <div className="p-4 flex justify-center">
             <button
                 onClick={() => fetchNextPage()}
@@ -86,7 +80,6 @@ export const PropertiesPageClient = () => {
             </button>
         </div>
 
-        {/* Deletion Confirmation Modal */}
         {propertyToDelete && (
             <ConfirmationModal
                 isOpen={!!propertyToDelete}
@@ -95,11 +88,7 @@ export const PropertiesPageClient = () => {
                 title="Delete Property"
                 confirmButtonText="Delete"
                 confirmButtonClassName="bg-red-600 hover:bg-red-500"
-                icon={
-                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <TriangleAlertIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
-                    </div>
-                }
+                icon={<div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100"><TriangleAlertIcon className="h-6 w-6 text-red-600" /></div>}
             >
                 Are you sure you want to delete the property at <strong>{propertyToDelete.address}</strong>? This action cannot be undone.
             </ConfirmationModal>
@@ -107,3 +96,4 @@ export const PropertiesPageClient = () => {
     </div>
   );
 };
+

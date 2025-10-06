@@ -145,15 +145,16 @@ export const JobListView = () => {
                     </button>
                   </th>
                 ))}
+                 {/* Add a header for the new actions column */}
+                <th scope="col" className="relative px-6 py-3">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {sortedJobs.map((job) => (
-                <Link
-                  key={job.id} 
-                  href={`/admin/job-oversight/${job.id}` as Route}
-                  className="table-row hover:bg-gray-50 cursor-pointer"
-                >
+                // FIX: Use a proper <tr> element for the table row
+                <tr key={job.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {job.id}
                   </td>
@@ -182,7 +183,13 @@ export const JobListView = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDateTime(job.scheduledDateTime)}
                   </td>
-                </Link>
+                   {/* FIX: Add a new <td> for the link */}
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Link href={`/admin/job-oversight/${job.id}` as Route} className="text-teal-600 hover:text-teal-900">
+                          Details
+                      </Link>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>

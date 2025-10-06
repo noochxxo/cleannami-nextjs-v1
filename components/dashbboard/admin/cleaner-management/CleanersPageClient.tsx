@@ -53,7 +53,7 @@ export function CleanersPageClient() {
   }, [queryClient]);
 
 
-  const allCleaners = useMemo(() => data?.pages.flatMap(page => page.cleaners) ?? [], [data]);
+  const allCleaners = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
   // De-duplicate to prevent key errors during real-time updates
   const uniqueCleaners = useMemo(() => 
@@ -93,7 +93,7 @@ export function CleanersPageClient() {
     setSortConfig({ key, direction });
   };
   
-  const handleManageCleaner = (cleaner: CleanersResponse['cleaners'][number]) => {
+  const handleManageCleaner = (cleaner: CleanersResponse['data'][number]) => {
     // Add your modal logic here
     console.log('Managing cleaner:', cleaner);
   };

@@ -1,12 +1,14 @@
-'use client'
+import { getSubscriptionsWithDetails } from '@/lib/queries/subscriptions';
+import { SubscriptionsPageClient } from '@/components/dashbboard/admin/subscriptions/SubscriptionsClientPage';
+import { PrefetchedInfinitePage } from '@/components/PrefetchedInfinitePage';
 
-import { usePathname } from "next/navigation"
-
-export default function Page() {
-  const pathname = usePathname()
+export default async function Page() {
   return (
-    <>
-      {pathname}
-    </>
-  )
+    <PrefetchedInfinitePage
+      queryKey={['subscriptions', { status: 'all', search: '' }]}
+      queryFn={() => getSubscriptionsWithDetails({ page: 1, limit: 10, status: 'all', query: '' })}
+    >
+      <SubscriptionsPageClient />
+    </PrefetchedInfinitePage>
+  );
 }

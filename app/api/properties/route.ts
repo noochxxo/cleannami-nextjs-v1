@@ -1,19 +1,21 @@
-import { getPropertiesWithOwner } from '@/lib/queries/properties';
+// app/api/properties/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { getPropertiesWithOwner } from '@/lib/queries/properties';
 
 export async function GET(request: NextRequest) {
   try {
-    const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get('page') || '1', 10);
-    const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+    const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const query = searchParams.get('query') || '';
 
-    const data = await getPropertiesWithOwner({ page, limit });
-
-    return NextResponse.json(data);
+    const result = await getPropertiesWithOwner({ page, limit, query });
+    
+    return NextResponse.json(result);
   } catch (error) {
-    console.error('Failed to fetch properties:', error);
+    console.error('Error fetching properties:', error);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Failed to fetch properties' },
       { status: 500 }
     );
   }
