@@ -7,9 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/db";
 import { formatError } from "@/lib/utils";
 import { AuthService } from "@/lib/services/auth/auth.service";
-import { log } from "console";
 import { AuthUserForm } from "@/lib/types/auth";
-import { success } from "zod";
 
 export async function signOut() {
   const supabase = await createClient();
@@ -59,7 +57,7 @@ export async function signUpUser(
   }
 
   const userRole = result.data?.user_metadata.role || "user";
-  console.log(userRole)
+  
 
   if (userRole === "user") {
     revalidatePath("/customer/dashboard");
@@ -114,7 +112,6 @@ export async function signInUser(
   }
 
   const userRole = result.data?.user_metadata.role || "user";
-  console.log(userRole)
 
   if (userRole === "user") {
     revalidatePath("/customer/dashboard");

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react"; // Import useState
+import { useEffect, useState } from "react"; // Import useState
 import {
   useInfiniteQuery,
   useQuery,
@@ -9,45 +9,13 @@ import {
 import Link from "next/link";
 import { Route } from "next";
 
-import { CalendarSyncButton } from "@/components/dashbboard/layout/ui/CalendarSyncButton";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { JobsWithDetails } from "@/lib/queries/jobs"; // Only importing the TYPE
+import { JobsWithDetails } from "@/lib/queries/jobs"; 
 import { createClient } from "@/lib/supabase/client";
 import { GetJobsResponse } from "@/app/api/jobs/route";
 import { formatDate } from "date-fns";
 import { GetJobStatsResponse } from "@/app/api/jobs/stats/route";
 
-// --- (Your existing KPI components and data can remain unchanged) ---
-interface Kpi {
-  title: string;
-  value: string;
-  change: string;
-  changeType: "increase" | "decrease";
-}
-{
-  /* <div>Showing {allJobs.length} of {data?.pages[0]?.total} jobs</div> */
-}
-const kpiData: Kpi[] = [
-  { title: "Jobs Today", value: "42", change: "+12%", changeType: "increase" },
-  {
-    title: "Weekly Revenue",
-    value: "$12,450",
-    change: "+5.2%",
-    changeType: "increase",
-  },
-  {
-    title: "Disputes Rate",
-    value: "1.2%",
-    change: "-0.5%",
-    changeType: "decrease",
-  },
-  {
-    title: "Cleaner Reliability",
-    value: "98.5%",
-    change: "+0.2%",
-    changeType: "increase",
-  },
-];
 
 const KpiCard = ({ title, value }: { title: string; value: string }) => {
   return (
@@ -320,7 +288,6 @@ export const RealTimeJobBoard = () => {
                               >
                                 Details
                               </Link>
-                              <CalendarSyncButton />
                             </td>
                           </tr>
                         ))}
