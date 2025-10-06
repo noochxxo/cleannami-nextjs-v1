@@ -4,10 +4,8 @@ import { ChevronDownIcon, ChevronsUpDown, ChevronUpIcon, UserIcon } from "lucide
 import { CleanersResponse } from "@/lib/queries/cleaners"; 
 import { formatDate } from "date-fns";
 
-// Define the shape of a single cleaner from our API response
 type Cleaner = CleanersResponse['data'][number];
 
-// --- Helper Functions ---
 const getStatusBadge = (status: "available" | "unavailable" | "on_job" | string | null | undefined) => {
   switch (status) {
     case 'available': return 'bg-green-100 text-green-800';
@@ -18,8 +16,6 @@ const getStatusBadge = (status: "available" | "unavailable" | "on_job" | string 
   }
 };
 
-// --- Shared Types ---
-// FIX: Exporting these types so they can be imported and shared by other components.
 export type SortDirection = 'ascending' | 'descending';
 export type SortableKey = 'fullName' | 'onCallStatus' | 'createdAt';
 
@@ -28,7 +24,6 @@ export interface SortConfig {
   direction: SortDirection;
 }
 
-// --- Component Props ---
 interface CleanersTableProps {
   cleaners: Cleaner[];
   sortConfig: SortConfig | null;

@@ -4,14 +4,12 @@ import { ConfirmationModal } from "../ui/ConfirmationModal";
 import { SubscriptionsWithDetails } from "@/lib/queries/subscriptions";
 import { Subscription } from "@/db/schemas";
 
-// Define the props for our component using the query response type
 interface SubscriptionModalProps {
-  subscription: SubscriptionsWithDetails['subscriptions'][number];
+  subscription: SubscriptionsWithDetails['data'][number];
   onClose: () => void;
   onUpdate: (subscription: Subscription) => void;
 }
 
-// A simple, reusable toggle switch component
 const ToggleSwitch = ({
   label,
   enabled,
@@ -59,7 +57,6 @@ export const SubscriptionDetailModal = ({
   }, [onClose]);
 
   const handleSave = () => {
-    // The parent's onUpdate function expects the core Subscription type
     onUpdate(localSub);
   };
 
@@ -116,7 +113,7 @@ export const SubscriptionDetailModal = ({
                   <span className="font-semibold text-green-700">Prepaid Term</span>
                 </div>
               )}
-               {/* Assuming 'paused' is a possible status, otherwise this logic can be removed */}
+              
               {localSub.status === "pending" && (
                 <div className="flex items-center text-sm">
                   <ClockIcon className="h-5 w-5 mr-3 text-yellow-500" />
@@ -134,7 +131,7 @@ export const SubscriptionDetailModal = ({
             <div>
               <h3 className="text-base font-semibold text-gray-800 mb-3">Actions</h3>
               <div className="space-y-3">
-                 {/* This logic assumes 'paused' is a status. Adjust if needed based on your business logic. */}
+                 
                 {localSub.status === "active" && (
                   <ActionButton onClick={() => handleStatusChange("pending")} text="Pause Subscription" className="bg-yellow-500 hover:bg-yellow-600" />
                 )}

@@ -1,6 +1,5 @@
-import { CustomerDetails } from "@/lib/queries/customerQueries";
+import { CustomerDetails } from "@/lib/queries/customers";
 
-// The component now accepts subscriptions as a prop
 interface SubscriptionsProps {
   subscriptions: CustomerDetails['subscriptions'];
 }

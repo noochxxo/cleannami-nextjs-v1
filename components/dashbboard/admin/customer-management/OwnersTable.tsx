@@ -3,12 +3,10 @@ import Link from "next/link";
 import { CustomersResponse } from "@/lib/queries/customers";
 import { useEffect, useState } from "react";
 
-// The component's props remain the same
 interface OwnersTableProps {
-  owners: CustomersResponse['customers'];
+  owners: CustomersResponse['data'];
 }
 
-// A small component to safely render dates only on the client
 const SafeClientDate = ({ date }: { date: Date | null }) => {
     const [formattedDate, setFormattedDate] = useState<string | null>(null);
     useEffect(() => {
@@ -19,13 +17,11 @@ const SafeClientDate = ({ date }: { date: Date | null }) => {
     return <>{formattedDate}</>;
 }
 
-
 export const OwnersTable = ({ owners = [] }: OwnersTableProps) => {
   if (owners.length === 0) {
     return (
       <tbody>
         <tr>
-          {/* FIX: Updated colSpan to match the new number of columns */}
           <td colSpan={5} className="text-center p-12 text-gray-500">
             No customers found.
           </td>

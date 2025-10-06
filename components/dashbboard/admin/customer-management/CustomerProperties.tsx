@@ -1,11 +1,9 @@
-import { CustomerDetails } from "@/lib/queries/customerQueries";
+import { CustomerDetails } from "@/lib/queries/customers";
 
-// The component now accepts the list of properties as a prop
 interface CustomerPropertiesProps {
   properties: CustomerDetails['properties'];
 }
 
-// FIX: Provide a default empty array to handle the case where 'properties' is undefined.
 interface CustomerPropertiesProps {
   properties: CustomerDetails['properties'];
 }

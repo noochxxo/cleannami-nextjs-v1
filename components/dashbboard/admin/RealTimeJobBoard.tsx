@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react"; // Import useState
+import { useEffect } from "react";
 import {
   useInfiniteQuery,
   useQuery,
@@ -10,45 +10,15 @@ import Link from "next/link";
 import { Route } from "next";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { JobsWithDetails } from "@/lib/queries/jobs"; 
+import { JobsWithDetails } from "@/lib/queries/jobs";
 import { createClient } from "@/lib/supabase/client";
 import { GetJobsResponse } from "@/app/api/jobs/route";
 import { formatDate } from "date-fns";
 import { GetJobStatsResponse } from "@/app/api/jobs/stats/route";
+import { KpiCard } from "./ui/KpiCard";
+import { ClientTime } from "./ui/ClientTime";
+import { getStatusBadge } from "../utils";
 
-
-const KpiCard = ({ title, value }: { title: string; value: string }) => {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-      <div className="mt-2 flex items-baseline justify-between">
-        <p className="text-3xl font-bold text-gray-900">{value}</p>
-      </div>
-    </div>
-  );
-};
-
-const getStatusBadge = (status: string) => {
-  switch (status) {
-    case "in-progress":
-      return "bg-blue-100 text-blue-800";
-    case "assigned":
-      return "bg-yellow-100 text-yellow-800";
-    case "unassigned":
-      return "bg-gray-100 text-gray-800";
-    case "completed":
-      return "bg-green-100 text-green-800";
-    case "canceled":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-200 text-gray-800";
-  }
-};
-
-/**
- * A client-safe function to fetch a page of jobs from our API route.
- */
-// For JobListView - Update to use real data
 async function fetchJobs({ pageParam = 1 }: { pageParam: number }) {
   const res = await fetch(`/api/jobs?page=${pageParam}`);
   if (!res.ok) {
@@ -61,33 +31,6 @@ async function fetchJobs({ pageParam = 1 }: { pageParam: number }) {
   };
 }
 
-/**
- * FIX: New component to safely render time on the client, avoiding hydration mismatches.
- */
-const ClientTime = ({
-  dateString,
-}: {
-  dateString: string | null | undefined;
-}) => {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted || !dateString) {
-    return <span>N/A</span>; // Render a placeholder on the server and initial client render
-  }
-
-  // This will only run on the client after mounting
-  const time = new Date(dateString).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  return <span>{time}</span>;
-};
-
 export const RealTimeJobBoard = () => {
   const { data: user } = useCurrentUser();
   const isAdmin =
@@ -96,17 +39,16 @@ export const RealTimeJobBoard = () => {
 
   const queryClient = useQueryClient();
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats } = useQuery({
     queryKey: ["jobs", "stats"],
     queryFn: async () => {
       const res = await fetch("/api/jobs/stats");
       if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json() as Promise<GetJobStatsResponse>;
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 30000,
   });
 
-  // Use the useInfiniteQuery hook for pagination
   const {
     data,
     error,
@@ -122,7 +64,6 @@ export const RealTimeJobBoard = () => {
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
 
-  // Real-time subscription logic remains the same.
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
@@ -149,9 +90,7 @@ export const RealTimeJobBoard = () => {
     };
   }, [queryClient]);
 
-  // Flatten all pages into a single array
   const allJobs = data?.pages.flatMap((page) => page.jobs) ?? [];
-  // FIX: De-duplicate the array to prevent React key errors during real-time updates
   const uniqueJobs = Array.from(
     new Map(
       allJobs.filter((job) => job != null).map((job) => [job.id, job])
@@ -162,20 +101,33 @@ export const RealTimeJobBoard = () => {
     <>
       {isAdmin && (
         <div className="space-y-8">
-          {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats && (
               <>
-                <KpiCard title="Total Jobs" value={stats.totalJobs.toString()} /> 
-                <KpiCard title="Active Jobs" value={stats.totalActive.toString()} /> 
-                <KpiCard title="Today's check-in Schedule" value={stats.totalToday.toString()} /> 
-                <KpiCard title="Completed" value={stats.totalCompleted.toString()} /> 
-                <KpiCard title="Canceled" value={stats.totalCanceled.toString()} />
+                <KpiCard
+                  title="Total Jobs"
+                  value={stats.totalJobs.toString()}
+                />
+                <KpiCard
+                  title="Active Jobs"
+                  value={stats.totalActive.toString()}
+                />
+                <KpiCard
+                  title="Today's check-in Schedule"
+                  value={stats.totalToday.toString()}
+                />
+                <KpiCard
+                  title="Completed"
+                  value={stats.totalCompleted.toString()}
+                />
+                <KpiCard
+                  title="Canceled"
+                  value={stats.totalCanceled.toString()}
+                />
               </>
             )}
           </div>
 
-          {/* Real-time Job Board */}
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Real-Time Job Board
@@ -213,7 +165,7 @@ export const RealTimeJobBoard = () => {
                         scope="col"
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
-                        Due By
+                        Check In Time
                       </th>
                       <th scope="col" className="relative px-6 py-3">
                         <span className="sr-only">Details</span>
@@ -248,11 +200,10 @@ export const RealTimeJobBoard = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {job.assignedCleaners.length > 0
-                                ? // FIX: Added an explicit type to the 'c' parameter to resolve the 'any' type error.
+                                ? 
                                   job.assignedCleaners
                                     .map(
                                       (
-                                        // c: JobsWithDetails[number]["cleaners"][number]
                                         c: JobsWithDetails["data"][number]["assignedCleaners"][number]
                                       ) => c.fullName
                                     )
@@ -269,7 +220,6 @@ export const RealTimeJobBoard = () => {
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {/* FIX: Use the client-safe component to render the time */}
                               {job.checkInTime ? (
                                 <ClientTime
                                   dateString={formatDate(
@@ -278,7 +228,7 @@ export const RealTimeJobBoard = () => {
                                   )}
                                 />
                               ) : (
-                                <span>N/A</span> // or null, or "—", etc.
+                                <span>N/A</span>
                               )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -296,7 +246,6 @@ export const RealTimeJobBoard = () => {
                   </tbody>
                 </table>
               </div>
-              {/* Pagination Button */}
               <div className="p-4 flex justify-center">
                 <button
                   onClick={() => fetchNextPage()}

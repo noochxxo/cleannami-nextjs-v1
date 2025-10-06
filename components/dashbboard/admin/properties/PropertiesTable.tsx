@@ -3,14 +3,11 @@ import Link from "next/link";
 import { ConfirmationModal } from "../ui/ConfirmationModal";
 import { PropertiesWithOwner } from "@/lib/queries/properties";
 
-// Define the component's props
 interface PropertiesTableProps {
   properties: PropertiesWithOwner['data'];
   onDelete: (property: PropertiesWithOwner['data'][number]) => void;
 }
 
-// NOTE: We are assuming `getStatusBadge` is a utility function you have defined elsewhere.
-// e.g., import { getStatusBadge } from '@/utils/getStatusBadge';
 const getStatusBadge = (status: string | null | undefined) => {
     // Dummy implementation
     if (status === 'active') return 'bg-green-100 text-green-800';
@@ -18,8 +15,6 @@ const getStatusBadge = (status: string | null | undefined) => {
 }
 
 export const PropertiesTable = ({ properties, onDelete }: PropertiesTableProps) => {
-  // We assume the state for the confirmation modal will be managed by the parent component.
-  // The `onDelete` function will trigger the parent to open the modal.
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">

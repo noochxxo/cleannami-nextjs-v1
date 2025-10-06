@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 import { SearchBar } from "@/components/dashbboard/admin/ui/SearchBar"; 
 import { useDebounce } from "use-debounce";
 
-// Client-safe fetcher, updated to pass the search query
 async function fetchCustomers({ pageParam = 1, queryKey }: { pageParam: number, queryKey: any[] }) {
   const [_, { search }] = queryKey;
   const res = await fetch(`/api/customers?page=${pageParam}&query=${search}`);
@@ -57,7 +56,7 @@ export function CustomerPageClient() {
     return () => { supabase.removeChannel(channel) };
   }, [queryClient]);
 
-  const allCustomers = useMemo( () => data?.pages.flatMap((page) => page.customers) ?? [], [data] );
+  const allCustomers = useMemo( () => data?.pages.flatMap((page) => page.data) ?? [], [data] );
   
   return (
     <div className="space-y-6">

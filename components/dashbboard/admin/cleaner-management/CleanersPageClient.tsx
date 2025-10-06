@@ -6,7 +6,6 @@ import { CleanersResponse } from '@/lib/queries/cleaners';
 import { createClient } from '@/lib/supabase/client';
 import { CleanersTable, SortableKey, SortConfig } from './CleanersTable';
 
-// Client-safe fetcher function
 async function fetchCleaners({ pageParam = 1 }: { pageParam: number }) {
   const res = await fetch(`/api/cleaners?page=${pageParam}`);
   if (!res.ok) {
@@ -33,7 +32,6 @@ export function CleanersPageClient() {
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
   
-  // Real-time updates
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
@@ -52,10 +50,8 @@ export function CleanersPageClient() {
     };
   }, [queryClient]);
 
-
   const allCleaners = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
-  // De-duplicate to prevent key errors during real-time updates
   const uniqueCleaners = useMemo(() => 
     Array.from(new Map(allCleaners.map(c => [c.id, c])).values()), 
     [allCleaners]
@@ -69,7 +65,6 @@ export function CleanersPageClient() {
         const valA = a[key];
         const valB = b[key];
 
-        // Add robust sorting logic to handle null values, pushing them to the end.
         if (valA === null) return 1;
         if (valB === null) return -1;
         
@@ -94,7 +89,6 @@ export function CleanersPageClient() {
   };
   
   const handleManageCleaner = (cleaner: CleanersResponse['data'][number]) => {
-    // Add your modal logic here
     console.log('Managing cleaner:', cleaner);
   };
 

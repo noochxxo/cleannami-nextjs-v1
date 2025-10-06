@@ -2,14 +2,10 @@
 import React from "react";
 import { Card } from "./Card";
 import { ArrowDown, CheckCircleIcon, ClipboardListIcon, Pencil } from "lucide-react";
-// The component now accepts checklist files (if they exist on the property)
-interface RightColumnProps {
-    // Assuming checklistFiles is a relation on your property
-    // checklistFiles: PropertyDetails['checklistFiles'];
-}
 
-export const PropertyDetailesRightColumn = ({}: RightColumnProps) => {
-  // Placeholder data until checklist schema is confirmed
+
+export const PropertyDetailesRightColumn = () => {
+  // Placeholder data for checklist
   const checklistHistory = [
       { version: 2, uploadDate: '2025-09-15', fileName: 'summer_checklist_v2.pdf', active: true },
       { version: 1, uploadDate: '2025-06-01', fileName: 'spring_checklist_v1.pdf', active: false },

@@ -1,13 +1,11 @@
 import { SubscriptionsWithDetails } from "@/lib/queries/subscriptions";
 import { useEffect, useState } from "react";
 
-// Define the props the component expects, derived from our query type
 interface SubscriptionsTableProps {
-  subscriptions: SubscriptionsWithDetails['subscriptions'];
-  onManage: (subscription: SubscriptionsWithDetails['subscriptions'][number]) => void;
+  subscriptions: SubscriptionsWithDetails['data'];
+  onManage: (subscription: SubscriptionsWithDetails['data'][number]) => void;
 }
 
-// A utility function to get the correct badge color based on the status from your schema
 const getStatusBadge = (status: 'active' | 'expired' | 'canceled' | 'pending' | null) => {
     switch(status) {
         case 'active': return 'bg-green-100 text-green-800';
@@ -18,7 +16,6 @@ const getStatusBadge = (status: 'active' | 'expired' | 'canceled' | 'pending' | 
     }
 }
 
-// A small component to prevent hydration errors with dates
 const SafeClientDate = ({ date }: { date: string | null }) => {
     const [formattedDate, setFormattedDate] = useState<string | null>(null);
     useEffect(() => {

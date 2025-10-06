@@ -19,7 +19,6 @@ export const Sidebar = () => {
 
   const visibleNavItems = user?.user_metadata.role === 'admin' || user?.user_metadata.role === 'super_admin' ? PRIVATE_ADMIN_NAV_ROUTES : PRIVATE_USER_NAV_ROUTES;
 
-  console.log('user: ',user)
 
   useEffect(() => {
     const html = document.documentElement;

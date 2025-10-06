@@ -11,7 +11,6 @@ export const Header = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const { data: user } = useCurrentUser();
   const activePage = usePathname();
-  console.log(user)
 
   return (
     <header className="w-full h-20 bg-white border-b border-gray-200 flex md:items-center justify-end md:justify-between px-0 md:px-8">

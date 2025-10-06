@@ -1,8 +1,7 @@
 'use client';
-import { CustomerDetails } from '@/lib/queries/customerQueries';
+import { CustomerDetails } from '@/lib/queries/customers';
 import { useEffect, useState } from 'react';
 
-// A small, dedicated component to safely render dates on the client
 const SafeClientDate = ({ date }: { date: Date | null | undefined }) => {
     const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
@@ -15,9 +14,8 @@ const SafeClientDate = ({ date }: { date: Date | null | undefined }) => {
     return <>{formattedDate}</>;
 }
 
-// The component now accepts jobs as a prop
 interface JobHistoryProps {
-  jobs: CustomerDetails['jobs'];
+  jobs: CustomerDetails['completedJobs'];
 }
 
 export const JobHistory = ({ jobs = [] }: JobHistoryProps) => {

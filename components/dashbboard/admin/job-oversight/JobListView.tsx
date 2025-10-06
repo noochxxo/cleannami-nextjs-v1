@@ -6,9 +6,10 @@ import {
   TriangleAlertIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { formatDateTime, getStatusBadge } from "../../utils";
+import { getStatusBadge } from "../../utils";
 import { Route } from "next";
 import Link from "next/link";
+import { formatDate } from "date-fns";
 
 type SortDirection = "ascending" | "descending";
 type SortableKey =
@@ -145,7 +146,6 @@ export const JobListView = () => {
                     </button>
                   </th>
                 ))}
-                 {/* Add a header for the new actions column */}
                 <th scope="col" className="relative px-6 py-3">
                   <span className="sr-only">Actions</span>
                 </th>
@@ -153,7 +153,6 @@ export const JobListView = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {sortedJobs.map((job) => (
-                // FIX: Use a proper <tr> element for the table row
                 <tr key={job.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {job.id}
@@ -181,9 +180,8 @@ export const JobListView = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDateTime(job.scheduledDateTime)}
+                    {/* {formatDate(job.scheduledDateTime)} */}
                   </td>
-                   {/* FIX: Add a new <td> for the link */}
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link href={`/admin/job-oversight/${job.id}` as Route} className="text-teal-600 hover:text-teal-900">
                           Details

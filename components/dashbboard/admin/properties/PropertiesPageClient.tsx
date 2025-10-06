@@ -10,7 +10,6 @@ import { ConfirmationModal } from '@/components/dashbboard/admin/ui/Confirmation
 import { TriangleAlertIcon, PlusIcon } from 'lucide-react';
 import { SearchBar } from '@/components/dashbboard/admin/ui/SearchBar';
 
-// Updated fetcher to pass the search query
 async function fetchProperties({ pageParam = 1, queryKey }: { pageParam?: number, queryKey: any[] }) {
   const [_, { search }] = queryKey;
   const res = await fetch(`/api/properties?page=${pageParam}&query=${search}`);
@@ -26,7 +25,6 @@ export const PropertiesPageClient = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
-  // The query key now includes the debounced search term
   const queryKey = useMemo(() => ['properties', { search: debouncedSearchTerm }], [debouncedSearchTerm]);
 
   const {
