@@ -71,7 +71,7 @@ export default function Layout({
           <p className="text-sm mt-2">
             Built by{" "}
             <a
-              href="https://trochiedigital.com"
+              href="https://trotchiedigital.com"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white underline transition-colors duration-300"
