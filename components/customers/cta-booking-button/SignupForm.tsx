@@ -49,27 +49,50 @@ const TOTAL_STEPS = 8;
 export const SignupForm = ({ isOpen, onClose }: Props) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<SignupFormData>({
-    name: "",
-    email: "",
-    emailConfirm: "",
-    phoneNumber: "",
-    address: "",
-    sqft: 900,
-    bedrooms: 2,
-    bathrooms: 1,
-    checklistFile: undefined,
-    useDefaultChecklist: false,
-    laundryService: "none",
-    laundryLoads: 1,
-    hasHotTub: false,
-    hotTubService: "none",
-    hotTubDrain: false,
-    hotTubDrainCadence: undefined,
-    subscriptionMonths: 6,
-    iCalUrl: "",
-    // @ts-expect-error: null is needed to prevent calendar from proceeding on invlid options
-    firstCleanDate: null,
-  });
+  name: "",
+  email: "",
+  emailConfirm: "",
+  phoneNumber: "",
+  address: "",
+  sqft: 900,
+  bedrooms: 2,
+  bathrooms: 1,
+  checklistFile: undefined,
+  useDefaultChecklist: false,
+  laundryService: "none",
+  laundryLoads: 1,
+  hasHotTub: false,
+  hotTubService: false,
+  hotTubDrain: false,
+  hotTubDrainCadence: undefined,
+  subscriptionMonths: 6,
+  iCalUrl: "",
+  isAddressInServiceArea: false,
+  // @ts-expect-error: null is needed to prevent calendar from proceeding on invalid options
+  firstCleanDate: null,
+});
+  // const [formData, setFormData] = useState<SignupFormData>({
+  //   name: "",
+  //   email: "",
+  //   emailConfirm: "",
+  //   phoneNumber: "",
+  //   address: "",
+  //   sqft: 900,
+  //   bedrooms: 2,
+  //   bathrooms: 1,
+  //   checklistFile: undefined,
+  //   useDefaultChecklist: false,
+  //   laundryService: "none",
+  //   laundryLoads: 1,
+  //   hasHotTub: false,
+  //   hotTubService: "none",
+  //   hotTubDrain: false,
+  //   hotTubDrainCadence: undefined,
+  //   subscriptionMonths: 6,
+  //   iCalUrl: "",
+  //   // @ts-expect-error: null is needed to prevent calendar from proceeding on invlid options
+  //   firstCleanDate: null,
+  // });
   const [priceDetails, setPriceDetails] = useState<PriceDetails | null>(null);
   const [errors, setErrors] = useState<Record<string, string[] | undefined>>(
     {}

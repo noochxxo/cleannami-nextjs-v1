@@ -20,7 +20,7 @@ export const signupFormSchema = z
     laundryService: z.enum(["in_unit", "off_site", "none"]),
     laundryLoads: z.coerce.number().int().min(1).optional(),
     hasHotTub: z.boolean().default(false),
-    hotTubService: z.enum(["none", "basic"]).optional(),
+    hotTubService: z.boolean(),
     hotTubDrain: z.boolean(),
     hotTubDrainCadence: z
       .enum(["4_weeks", "6_weeks", "2_months", "3_months", "4_months"])

@@ -29,9 +29,7 @@ export const properties = pgTable(
       enum: ["in_unit", "off_site", "none"],
     }).notNull(),
     laundryLoads: integer("laundry_loads"),
-    hotTubServiceLevel: varchar("hot_tub_service_level", {
-      enum: ["none", "basic_clean"],
-    }),
+    hotTubServiceLevel: boolean("hot_tub_service").default(false).notNull(),
     hotTubDrain: boolean("needs_drain").default(false).notNull(),
     hotTubDrainCadence: varchar("hot_tub_drain_cadence", {
       enum: ["4_weeks", "6_weeks", "2_months", "3_months", "4_months"],

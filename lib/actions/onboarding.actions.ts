@@ -163,6 +163,7 @@
 //   }
 // }
 
+
 "use server";
 
 import { db } from "@/db";
@@ -178,12 +179,33 @@ import Stripe from 'stripe';
 import { ICalService } from "../services/iCal/ical.service";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!;
 
-// Helper function to map form values to database enum values
-function mapHotTubService(service: string | undefined): "none" | "basic_clean" | null {
-  if (!service || service === "none") return "none";
-  if (service === "basic") return "basic_clean";
-  return null;
+// ✅ Add geocoding function
+async function geocodeAddress(address: string): Promise<{ latitude: string; longitude: string } | null> {
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+        address
+      )}&key=${GOOGLE_MAPS_API_KEY}`
+    );
+
+    const data = await response.json();
+
+    if (data.status === 'OK' && data.results.length > 0) {
+      const location = data.results[0].geometry.location;
+      return {
+        latitude: location.lat.toString(),
+        longitude: location.lng.toString(),
+      };
+    }
+
+    console.warn('Geocoding failed during onboarding:', data.status, address);
+    return null;
+  } catch (error) {
+    console.error('Geocoding error during onboarding:', error);
+    return null;
+  }
 }
 
 export async function completeOnboarding(
@@ -213,12 +235,17 @@ export async function completeOnboarding(
       laundryService,
       laundryLoads,
       hotTubService,
+      hotTubDrain,
       hotTubDrainCadence,
       subscriptionMonths,
       checklistFile,
+      useDefaultChecklist,
       iCalUrl,
       firstCleanDate,
     } = validatedData;
+
+    // ✅ Geocode the address
+    const coordinates = await geocodeAddress(address);
 
     const result = await db.transaction(async (tx) => {
       
@@ -241,22 +268,48 @@ export async function completeOnboarding(
         })
         .returning();
 
+      // ✅ Build property values with geocoded data
+      const propertyValues: any = {
+        customerId: customer.id,
+        address,
+        sqFt: sqft,
+        bedCount: bedrooms,
+        bathCount: String(bathrooms),
+        hasHotTub,
+        laundryType: laundryService,
+        laundryLoads,
+        hotTubServiceLevel: hotTubService,
+        hotTubDrain: hotTubDrain,
+        hotTubDrainCadence,
+        useDefaultChecklist: useDefaultChecklist,
+        iCalUrl,
+      };
+
+      // ✅ Add geocoded coordinates if available
+      if (coordinates) {
+        propertyValues.latitude = coordinates.latitude;
+        propertyValues.longitude = coordinates.longitude;
+        propertyValues.geocodedAt = new Date();
+      }
+
       const [property] = await tx
         .insert(properties)
-        .values({
-          customerId: customer.id,
-          address,
-          sqFt: sqft,
-          bedCount: bedrooms,
-          bathCount: String(bathrooms),
-          hasHotTub,
-          laundryType: laundryService,
-          laundryLoads,
-          hotTubServiceLevel: mapHotTubService(hotTubService),
-          hotTubDrainCadence,
-          iCalUrl,
-        })
-        .returning();
+        .values(propertyValues)
+        .returning()
+        .catch((err) => {
+    console.error('DETAILED INSERT ERROR:', {
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
+      hint: err.hint,
+      constraint: err.constraint,
+      table: err.table,
+      column: err.column,
+      dataType: err.dataType,
+      values: propertyValues
+    });
+    throw err;
+  });
 
       if (checklistFile && checklistFile.length > 0) {
         for (const file of checklistFile) {
@@ -281,19 +334,16 @@ export async function completeOnboarding(
         }
       }
 
-      // Calculate end date based on start date and duration
       const startDate = new Date(firstCleanDate);
       const endDate = new Date(startDate);
       endDate.setMonth(endDate.getMonth() + subscriptionMonths);
 
-      // TODO: For future recurring billing implementation, create a Stripe Subscription here
-      // and populate stripeSubscriptionId. For now, we're handling payments manually.
       const [subscription] = await tx
         .insert(subscriptions)
         .values({
           customerId: customer.id,
           propertyId: property.id,
-          stripeSubscriptionId: null, // TODO: Implement Stripe Subscriptions for automatic recurring billing
+          stripeSubscriptionId: null,
           durationMonths: subscriptionMonths,
           firstCleanPaymentId: paymentIntentId,
           isFirstCleanPrepaid: true,
@@ -310,14 +360,9 @@ export async function completeOnboarding(
       console.log(`Onboarding successful. Triggering initial calendar sync for subscription: ${result.subscription.id}`);
       try {
         const icalService = new ICalService(db);
-        // We use the subscriptionId from the 'result' of our transaction.
         await icalService.syncCalendar({ subscriptionId: result.subscription.id });
         console.log("Initial calendar sync completed successfully.");
       } catch (syncError) {
-        // IMPORTANT: We log the error, but we don't throw it.
-        // The main onboarding was successful, and a failed initial sync
-        // shouldn't tell the user that the whole process failed.
-        // This can be monitored and retried by a cron job later.
         console.error(
           `CRITICAL: Initial calendar sync failed for new subscription ${result.subscription.id}`,
           syncError
@@ -330,7 +375,8 @@ export async function completeOnboarding(
   } catch (error) {
     console.error("CRITICAL: Onboarding failed after successful payment.", {
       paymentIntentId,
-      error: (error as Error).message,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
       formData,
     });
 
