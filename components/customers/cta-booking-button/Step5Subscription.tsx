@@ -11,8 +11,8 @@ import { StepFeedback } from "./StepFeedback";
 const firstAvailableDay = addDays(new Date(), 7);
 
 export const Step5Subscription = ({ formData, setFormData, errors }: StepsProps) => {
-  const handleTermSelect = (months: number) =>
-    setFormData((prev) => ({ ...prev, subscriptionMonths: months }));
+  // const handleTermSelect = (months: number) =>
+  //   setFormData((prev) => ({ ...prev, subscriptionMonths: months }));
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
