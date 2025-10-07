@@ -2,7 +2,25 @@
 
 ## Getting Started
 
+The admin dashboards are not complete but enough is done to see
+what you data.
+
+Full documentation is in `docs` folder.
+
+- full payment process iscomplete from collecting payments from customers
+  automated nightly preauths, completeing the payment process, paying cleaners.
+- To set the price create csv files and upload them in the dashboard.
+  examples are in `pricing_data` folder.
+
 First, run the development server:
+
+- Create account on `cron-job.org` to create cron jobs
+- Create a secret key for cron jobs
+- generate api key for app to hit `api/jobs/complete-and-capture`
+- Since the logo image is solarge i have to upload it
+  to an image hosting site. I used `uploadthing.com` its free.
+  Where ever you choose to host it just grab the image link and
+  past it in `lib/constants/index.ts` with the `logo` variable.
 
 - Fill in the .env variables
   - google maps and places (one api key)
