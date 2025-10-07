@@ -14,23 +14,31 @@ export const Features = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
             icon={<CalendarDaysIcon className="h-8 w-8 text-white" />}
-            title="Seamless Automation"
-            description="Set up your property once. Every booking is automatically scheduled with all your preferences integrated."
+            title="Seamless Booking & Automation"
+            description="Set up your property preferences once, and CleanNami takes care
+                of the rest. Every booking is automatically scheduled, with all
+                add-ons and customer checklists integrated into the clean."
           />
           <FeatureCard
             icon={<DollarSign />}
-            title="Transparent Pricing"
-            description="No hidden fees. See the exact flat-rate price upfront, and it stays the same for every single turnover."
+            title="Consistent & Transparent Pricing"
+            description="No haggling, no hidden fees. You see the exact price upfront —
+                based on your property details, laundry needs, and hot tub
+                options — and it stays the same every clean."
           />
           <FeatureCard
             icon={<SparklesIcon />}
-            title="Turnkey Turnovers"
-            description="We don’t just clean—we stage beds, restock essentials, and prepare your property for a five-star guest impression."
+            title="Turnkey Turnovers, Not Just Cleaning"
+            description="Our cleaners don’t just scrub — they stage beds, restock
+                essentials already in your unit, reset hot tubs, and prepare
+                your property so guests feel like the very first check-in."
           />
           <FeatureCard
             icon={<ShieldCheckIcon />}
-            title="Guaranteed Reliability"
-            description="With GPS-verified cleaners and a tiered backup system, your turnovers get done on time, every time. Period."
+            title="Reliability You Can Trust"
+            description="Cleaners are GPS-verified at check-in and check-out. With
+                performance tracking and a dedicated on-call backup pool, your
+                turnovers get done on time, every time."
           />
         </div>
       </div>

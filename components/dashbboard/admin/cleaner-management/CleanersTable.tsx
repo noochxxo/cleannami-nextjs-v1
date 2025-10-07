@@ -102,14 +102,14 @@ export const CleanersTable = ({ cleaners, sortConfig, onSort, onManageCleaner }:
                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {formatDate(cleaner.createdAt, 'yyyy-MM-dd')}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                {/* <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => onManageCleaner(cleaner)}
                     className="text-teal-600 hover:text-teal-900"
                   >
                     Manage
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

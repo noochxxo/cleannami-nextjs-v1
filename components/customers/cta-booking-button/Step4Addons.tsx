@@ -1,6 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 import { RadioCard } from "./RadioCard";
 import { StepsProps } from "@/lib/validations/bookng-modal";
+import { CheckboxCard } from "./CheckboxCard";
 
 export const Step4Addons = ({ formData, setFormData }: StepsProps) => {
   const handleChange = (
@@ -8,9 +9,36 @@ export const Step4Addons = ({ formData, setFormData }: StepsProps) => {
   ) => {
     const { name, value, type } = e.target;
     const isCheckbox = type === "checkbox";
-    setFormData((prev) => ({
+    const checked = (e.target as HTMLInputElement).checked;
+
+    // Special handling for hot tub services to ensure 'none' is deselected
+    if (name === 'hotTubService' && checked) {
+        setFormData(prev => ({
+            ...prev,
+            hotTubService: 'basic', // Set to basic when checked
+        }));
+    } else if (name === 'hotTubDrain' && checked) {
+        setFormData(prev => ({
+            ...prev,
+            hotTubDrain: true,
+            // Also select basic clean if drain is selected
+            hotTubService: 'basic',
+        }));
+    } else if (name === 'hotTubDrain' && !checked) {
+        setFormData(prev => ({ ...prev, hotTubDrain: false }));
+    } else {
+        setFormData((prev) => ({
+            ...prev,
+            [name]: isCheckbox ? checked : value,
+        }));
+    }
+  };
+
+  const handleNoHotTubService = () => {
+    setFormData(prev => ({
       ...prev,
-      [name]: isCheckbox ? (e.target as HTMLInputElement).checked : value,
+      hotTubService: 'none',
+      hotTubDrain: false,
     }));
   };
 
@@ -18,6 +46,7 @@ export const Step4Addons = ({ formData, setFormData }: StepsProps) => {
     <div className="space-y-8">
       <div>
         <h3 className="text-lg font-medium text-gray-900">Laundry Service</h3>
+        {/* Laundry service code remains the same as in your file */}
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
           <RadioCard
             id="laundry-in_unit"
@@ -85,12 +114,12 @@ export const Step4Addons = ({ formData, setFormData }: StepsProps) => {
               id="hotTub-none"
               name="hotTubService"
               value="none"
-              checked={formData.hotTubService === "none"}
+              checked={formData.hotTubService === 'none' && !formData.hotTubDrain}
               title="No Service"
               description="I will manage hot tub cleaning myself."
-              onChange={handleChange}
+              onChange={handleNoHotTubService}
             />
-            {formData.hotTubService === "none" && (
+            {formData.hotTubService === 'none' && !formData.hotTubDrain && (
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md flex items-start">
                 <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" />
                 <p className="text-sm text-yellow-800">
@@ -99,25 +128,25 @@ export const Step4Addons = ({ formData, setFormData }: StepsProps) => {
                 </p>
               </div>
             )}
-            <RadioCard
+            <CheckboxCard
               id="hotTub-basic"
               name="hotTubService"
-              value="basic"
+              value="basic_clean"
               checked={formData.hotTubService === "basic"}
               title="Basic Clean (+$20)"
               description="Surface clean & chemical test each turnover."
               onChange={handleChange}
             />
-            <RadioCard
-              id="hotTub-premium"
-              name="hotTubService"
-              value="premium"
-              checked={formData.hotTubService === "premium"}
+            <CheckboxCard
+              id="hotTub-drain"
+              name="hotTubDrain"
+              value="true"
+              checked={formData.hotTubDrain === true}
               title="Full Drain & Refill (+$50)"
               description="A scheduled deep clean for a pristine tub."
               onChange={handleChange}
             />
-            {formData.hotTubService === "premium" && (
+            {formData.hotTubDrain && (
               <div className="mt-4 pl-6">
                 <label
                   htmlFor="hotTubDrainCadence"
@@ -131,7 +160,6 @@ export const Step4Addons = ({ formData, setFormData }: StepsProps) => {
                   value={formData.hotTubDrainCadence}
                   onChange={handleChange}
                   className="mt-1 block w-full text-base text-gray-800 pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2  focus:ring-teal-500"
-                  
                 >
                   <option value="4_weeks">Every 4 Weeks</option>
                   <option value="6_weeks">Every 6 Weeks</option>
@@ -145,3 +173,4 @@ export const Step4Addons = ({ formData, setFormData }: StepsProps) => {
     </div>
   );
 };
+

@@ -44,8 +44,26 @@ export const SubscriptionDetailModal = ({
   onClose,
   onUpdate,
 }: SubscriptionModalProps) => {
-  // Use a more specific type for the local state, including UI-specific fields
-  const [localSub, setLocalSub] = useState({ ...subscription, autoRenew: true });
+  // Extract only the Subscription fields, plus autoRenew for UI state
+  const [localSub, setLocalSub] = useState<Subscription & { autoRenew: boolean }>(() => {
+    const sub: Subscription = {
+      id: subscription.id,
+      customerId: subscription.customerId,
+      propertyId: subscription.propertyId,
+      stripeSubscriptionId: subscription.stripeSubscriptionId,
+      durationMonths: subscription.durationMonths,
+      status: subscription.status,
+      firstCleanPaymentId: subscription.firstCleanPaymentId,
+      isFirstCleanPrepaid: subscription.isFirstCleanPrepaid,
+      startDate: subscription.startDate,
+      endDate: subscription.endDate ?? new Date().toISOString().split('T')[0],
+      iCalSyncFailed: subscription.iCalSyncFailed ?? false,
+      lastSyncAttempt: subscription.lastSyncAttempt ?? null,
+      createdAt: subscription.createdAt,
+      updatedAt: subscription.updatedAt,
+    };
+    return { ...sub, autoRenew: true };
+  });
   const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
 
   useEffect(() => {
@@ -57,7 +75,9 @@ export const SubscriptionDetailModal = ({
   }, [onClose]);
 
   const handleSave = () => {
-    onUpdate(localSub);
+    // Remove autoRenew before passing to onUpdate since it's not part of Subscription type
+    const { autoRenew, ...subscriptionData } = localSub;
+    onUpdate(subscriptionData);
   };
 
   const handleStatusChange = (newStatus: 'active' | 'expired' | 'canceled' | 'pending') => {

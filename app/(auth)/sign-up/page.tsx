@@ -1,4 +1,4 @@
-import { Lock, Mail } from "lucide-react";
+
 import Link from "next/link";
 import CredentialsSignUpForm from "./credentials-signup-form";
 

@@ -15,17 +15,18 @@ const SafeClientDate = ({ date }: { date: Date | null | undefined }) => {
 }
 
 interface JobHistoryProps {
-  jobs: CustomerDetails['completedJobs'];
+  jobs: CustomerDetails['recentJobs'];
+  properties: CustomerDetails['properties'];
 }
 
-export const JobHistory = ({ jobs = [] }: JobHistoryProps) => {
+export const JobHistory = ({ jobs = [], properties=[] }: JobHistoryProps) => {
   return (
     <tbody className="divide-y">
       {jobs.length > 0 ? (
         jobs.map((job) => (
           <tr key={job.id}>
             <td className="px-4 py-2 font-mono text-xs">{job.id.substring(0,8)}...</td>
-            <td className="px-4 py-2">{job.property?.address ?? 'N/A'}</td>
+            {/* <td className="px-4 py-2">{properties.id [job.propertyId] ?? 'N/A'}</td> */}
             <td className="px-4 py-2">
               <SafeClientDate date={job.checkInTime} />
             </td>

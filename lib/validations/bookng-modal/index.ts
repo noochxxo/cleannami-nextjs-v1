@@ -10,17 +10,18 @@ export const signupFormSchema = z
     isAddressInServiceArea: z.boolean().refine((val) => val === true, {
       message: "The selected address must be within our service area.",
     }),
-    sqft: z.number().positive().optional(),
+    sqft: z.number().positive(),
     bedrooms: z.number().min(1, "Must have at least 1 bedroom"),
     bathrooms: z.number().min(1, "Must have at least 1 bathroom"),
     checklistFile: z
-      .array(z.instanceof(File), { message: "A checklist file is required." })
-      .min(1, "A checklist file is required.")
+      .array(z.instanceof(File))
       .optional(),
+    useDefaultChecklist: z.boolean().optional(),
     laundryService: z.enum(["in_unit", "off_site", "none"]),
     laundryLoads: z.coerce.number().int().min(1).optional(),
-    hasHotTub: z.boolean(),
-    hotTubService: z.enum(["none", "basic", "premium"]).optional(),
+    hasHotTub: z.boolean().default(false),
+    hotTubService: z.enum(["none", "basic"]).optional(),
+    hotTubDrain: z.boolean(),
     hotTubDrainCadence: z
       .enum(["4_weeks", "6_weeks", "2_months", "3_months", "4_months"])
       .optional(),

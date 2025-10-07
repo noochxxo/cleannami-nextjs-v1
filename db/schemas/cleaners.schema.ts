@@ -9,15 +9,15 @@ export const cleaners = pgTable("cleaners", {
   email: text("email").notNull().unique(),
   phone: text("phone_number"),
   address: text("address"),
-  profilePhotoUrl: text("profile_photo_url"), // This already correctly stores a link
+  profilePhotoUrl: text("profile_photo_url"),
   experienceYears: integer("experience_years"),
   hasHotTubCert: boolean("has_hot_tub_cert").default(false),
-  reliabilityScore: numeric("reliability_score", { precision: 5, scale: 2 }), // e.g., 99.50
+  reliabilityScore: numeric("reliability_score", { precision: 5, scale: 2 }), 
   onCallStatus: onCallStatusEnum("on_call_status").default('unavailable'),
   stripeAccountId: text("stripe_account_id").unique(),
-
-  // --- UPDATED FIELD ---
-  // This JSON object now stores the path/URL to the signed documents in your storage bucket.
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  geocodedAt: timestamp("geocoded_at"),
   legalDocsSigned: jsonb("legal_docs_signed").$type<{
     w9Url: string | null;
     liabilityWaiverUrl: string | null;
@@ -26,8 +26,9 @@ export const cleaners = pgTable("cleaners", {
   
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-}, (table) => ({
+}, (table) => [
   // Index for job assignment engine ranking
-  reliabilityIdx: index("cleaners_reliability_idx").on(table.reliabilityScore),
-}));
+  index("cleaners_reliability_idx").on(table.reliabilityScore),
+  index("cleaners_location_idx").on(table.latitude, table.longitude),
+]);
 

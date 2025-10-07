@@ -42,6 +42,9 @@ export async function getSubscriptionsWithDetails({
       firstCleanPaymentId: subscriptions.firstCleanPaymentId,
       isFirstCleanPrepaid: subscriptions.isFirstCleanPrepaid,
       startDate: subscriptions.startDate,
+      endDate: subscriptions.endDate,  // ADD THIS
+      iCalSyncFailed: subscriptions.iCalSyncFailed,  // ADD THIS
+      lastSyncAttempt: subscriptions.lastSyncAttempt,  // ADD THIS
       createdAt: subscriptions.createdAt,
       updatedAt: subscriptions.updatedAt,
 

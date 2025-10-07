@@ -30,18 +30,24 @@ export const properties = pgTable(
     }).notNull(),
     laundryLoads: integer("laundry_loads"),
     hotTubServiceLevel: varchar("hot_tub_service_level", {
-      enum: ["none", "basic", "premium"],
+      enum: ["none", "basic_clean"],
     }),
+    hotTubDrain: boolean("needs_drain").default(false).notNull(),
     hotTubDrainCadence: varchar("hot_tub_drain_cadence", {
       enum: ["4_weeks", "6_weeks", "2_months", "3_months", "4_months"],
     }),
+    useDefaultChecklist: boolean("use_default_check_lict").default(false).notNull(),
+    latitude: numeric("latitude", { precision: 10, scale: 8 }),
+    longitude: numeric("longitude", { precision: 11, scale: 8 }),
+    geocodedAt: timestamp("geocoded_at"),
     iCalUrl: text('ical_url'),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => {
-    return [index("properties_customer_idx").on(table.customerId)];
-  }
+  (table) => [
+    index("properties_customer_idx").on(table.customerId),
+    index("properties_location_idx").on(table.latitude, table.longitude),
+  ]
 );
 
 export const insertPropertySchema = createInsertSchema(properties);

@@ -22,8 +22,8 @@ import { cn } from "@/lib/utils";
 
 const stepFields: Record<number, string[]> = {
   1: ["name", "email", "emailConfirm", "phoneNumber"],
-  2: ["address", "bedrooms", "bathrooms", "isAddressInServiceArea"],
-  3: ["checklistFile"],
+  2: ["address", "bedrooms","sqft", "bathrooms", "isAddressInServiceArea"],
+  // 3: ["checklistFile", "useDefaultChecklist"],
   5: ["firstCleanDate"],
   6: ["iCalUrl"],
 };
@@ -58,10 +58,12 @@ export const SignupForm = ({ isOpen, onClose }: Props) => {
     bedrooms: 2,
     bathrooms: 1,
     checklistFile: undefined,
+    useDefaultChecklist: false,
     laundryService: "none",
     laundryLoads: 1,
     hasHotTub: false,
     hotTubService: "none",
+    hotTubDrain: false,
     hotTubDrainCadence: undefined,
     subscriptionMonths: 6,
     iCalUrl: "",
@@ -83,31 +85,80 @@ export const SignupForm = ({ isOpen, onClose }: Props) => {
     setPriceDetails(details);
   }, [formData, pricingService]);
 
+  // const validateStep = (step: number) => {
+    
+  //   const fieldsToValidate = stepFields[step];
+  //   if (!fieldsToValidate) {
+  //     setErrors({});
+  //     return true;
+  //   }
+
+  //   const result = signupFormSchema.partial().safeParse(formData);
+  //   if (result.success) {
+  //     setErrors({});
+  //     return true;
+  //   }
+
+  //   // const fieldErrors = result.error.flatten().fieldErrors;
+  //   const fieldErrors = result.error.flatten().fieldErrors;
+  //   const currentStepErrors: Record<string, string[] | undefined> = {};
+  //   let hasErrorOnStep = false;
+  //   fieldsToValidate.forEach((field) => {
+  //     if (fieldErrors[field as keyof SignupFormData]) {
+  //       currentStepErrors[field] = fieldErrors[field as keyof SignupFormData];
+  //       hasErrorOnStep = true;
+  //     }
+  //   });
+  //   setErrors(currentStepErrors);
+  //   return !hasErrorOnStep;
+  // };
+
   const validateStep = (step: number) => {
-    const fieldsToValidate = stepFields[step];
-    if (!fieldsToValidate) {
+  // --- Step 3 Special Validation ---
+  if (step === 3) {
+    const useDefault = formData.useDefaultChecklist;
+    const hasFile = formData.checklistFile && formData.checklistFile.length > 0;
+
+    // If one of the options is chosen, the step is valid.
+    if (useDefault || hasFile) {
       setErrors({});
       return true;
     }
 
-    const result = signupFormSchema.partial().safeParse(formData);
-    if (result.success) {
-      setErrors({});
-      return true;
-    }
-
-    const fieldErrors = result.error.flatten().fieldErrors;
-    const currentStepErrors: Record<string, string[] | undefined> = {};
-    let hasErrorOnStep = false;
-    fieldsToValidate.forEach((field) => {
-      if (fieldErrors[field as keyof SignupFormData]) {
-        currentStepErrors[field] = fieldErrors[field as keyof SignupFormData];
-        hasErrorOnStep = true;
-      }
+    // If neither is chosen, show an error and fail validation.
+    setErrors({
+      checklistFile: [
+        "Please either upload a checklist or select the default option.",
+      ],
     });
-    setErrors(currentStepErrors);
-    return !hasErrorOnStep;
-  };
+    return false;
+  }
+
+  // --- Default Zod Validation for all other steps ---
+  const fieldsToValidate = stepFields[step];
+  if (!fieldsToValidate) {
+    setErrors({});
+    return true;
+  }
+
+  const result = signupFormSchema.partial().safeParse(formData);
+  if (result.success) {
+    setErrors({});
+    return true;
+  }
+
+  const fieldErrors = result.error.flatten().fieldErrors;
+  const currentStepErrors: Record<string, string[] | undefined> = {};
+  let hasErrorOnStep = false;
+  fieldsToValidate.forEach((field) => {
+    if (fieldErrors[field as keyof SignupFormData]) {
+      currentStepErrors[field] = fieldErrors[field as keyof SignupFormData];
+      hasErrorOnStep = true;
+    }
+  });
+  setErrors(currentStepErrors);
+  return !hasErrorOnStep;
+};
 
   const nextStep = () => {
     if (validateStep(currentStep)) {

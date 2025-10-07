@@ -21,7 +21,7 @@ async function fetchProperties({ pageParam = 1, queryKey }: { pageParam?: number
 
 export const PropertiesPageClient = () => {
   const queryClient = useQueryClient();
-  const [propertyToDelete, setPropertyToDelete] = useState<PropertiesWithOwner['properties'][number] | null>(null);
+  const [propertyToDelete, setPropertyToDelete] = useState<PropertiesWithOwner['data'][number] | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
@@ -52,7 +52,7 @@ export const PropertiesPageClient = () => {
       setPropertyToDelete(null);
   }
 
-  const allProperties = data?.pages.flatMap(page => page.properties) ?? [];
+  const allProperties = data?.pages.flatMap(page => page.data) ?? [];
 
   return (
      <div className="space-y-6">

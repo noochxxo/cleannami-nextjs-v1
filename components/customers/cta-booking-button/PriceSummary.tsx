@@ -61,6 +61,7 @@ export const PriceSummary = ({ priceDetails }: Props) => {
             value={`$${priceDetails.hotTubCost.toFixed(2)}`}
           />
         )}
+        
         <div className="pt-2 border-t border-gray-200 mt-2">
           <PriceRow
             label="Total per Clean"

@@ -10,17 +10,25 @@ type DrizzleDb = NodePgDatabase<typeof schema>;
 
 const BATCH_SIZE = 100;
 
-// Type for the flexible input arguments
 type SyncInput = {
   subscriptionId?: string;
   propertyId?: string;
 };
 
-// Type for the context needed by the processing methods
 type SyncContext = {
   subscriptionId: string;
   propertyId: string;
   iCalUrl: string;
+};
+
+type PropertyDetails = {
+  bedCount: number;
+  bathCount: string;
+  sqFt: number | null;
+  laundryType: string;
+  laundryLoads: number | null;
+  hotTubServiceLevel: string | null;
+  hotTubDrainCadence: string | null;
 };
 
 export class ICalService {
@@ -30,16 +38,9 @@ export class ICalService {
     this.db = db;
   }
 
-  /**
-   * Main public method to sync a calendar. It can be initiated
-   * with either a subscriptionId or a propertyId.
-   * @param args An object containing either a subscriptionId or a propertyId.
-   * @returns A summary object of the sync operation.
-   */
   public async syncCalendar(args: SyncInput) {
     console.log(`Starting calendar sync with args:`, args);
 
-    // 1. Resolve the provided ID into the context we need to proceed.
     const contextResult = await this._getContext(args);
     if (!contextResult.success || !contextResult.data) {
       return { success: false, message: contextResult.message };
@@ -47,7 +48,6 @@ export class ICalService {
 
     const { subscriptionId, propertyId, iCalUrl } = contextResult.data;
 
-    // 2. Fetch and parse the calendar data
     const events = await this._fetchAndParseCalendar(iCalUrl);
     if (!events) {
       return { success: false, message: "Failed to fetch or parse calendar." };
@@ -58,20 +58,24 @@ export class ICalService {
       return { success: true, message: "Calendar is empty, nothing to sync.", totalSynced: 0 };
     }
 
-    // 3. Process the events in batches
+    // Get property details for calculating expected hours
+    const property = await this.db.query.properties.findFirst({
+      where: eq(schema.properties.id, propertyId),
+    });
+
+    if (!property) {
+      return { success: false, message: "Property not found." };
+    }
+
     const result = await this._processAndSaveEventsInBatches(events, {
       subscriptionId,
       propertyId,
-    });
+    }, property);
     
     console.log(`Sync complete. Total jobs synced: ${result.totalSynced}`);
     return { success: true, ...result };
   }
 
-  /**
-   * Resolves either a subscriptionId or propertyId into the full context
-   * (subscriptionId, propertyId, iCalUrl) needed for the sync.
-   */
   private async _getContext(args: SyncInput): Promise<{ success: boolean; data?: SyncContext; message?: string }> {
     const { subscriptionId, propertyId } = args;
 
@@ -100,7 +104,6 @@ export class ICalService {
       if (!property) return { success: false, message: "Property not found." };
       if (!property.iCalUrl) return { success: false, message: "No iCal URL found for this property." };
       
-      // Since jobs must be linked to a subscription, we find an active one for this property.
       const activeSubscription = await this.db.query.subscriptions.findFirst({
           where: and(
               eq(schema.subscriptions.propertyId, propertyId),
@@ -134,17 +137,62 @@ export class ICalService {
     }
   }
 
+  private _calculateExpectedHours(property: PropertyDetails): number {
+    const { bedCount, bathCount, sqFt, laundryType, hotTubServiceLevel } = property;
+    
+    // Base time formula from spec
+    const bathCountNum = Number(bathCount);
+    let baseTime = -0.585 + (0.950 * bedCount) + (0.620 * bathCountNum);
+     if (sqFt) {
+      baseTime += 0.1905 * (sqFt / 250);
+    }
+
+    // Determine job size
+    let jobSize: 'small' | 'medium' | 'large';
+    if (bedCount <= 2) jobSize = 'small';
+    else if (bedCount <= 4) jobSize = 'medium';
+    else jobSize = 'large';
+
+    
+    
+    if (laundryType === 'off_site') {
+      if (jobSize === 'small') baseTime += 1.25;
+      else if (jobSize === 'medium') baseTime += 1.75;
+      else baseTime += 2.25;
+    }
+
+    // Add hot tub time
+    if (hotTubServiceLevel === 'basic') {
+      baseTime += 0.333;
+    } else if (hotTubServiceLevel === 'premium') {
+      baseTime += 1.0;
+    }
+
+    // Round to 2 decimals
+    return Math.round(baseTime * 100) / 100;
+  }
+
   private async _processAndSaveEventsInBatches(
     events: VEvent[],
-    context: { subscriptionId: string; propertyId: string }
+    context: { subscriptionId: string; propertyId: string },
+    property: PropertyDetails
   ) {
+    const expectedHours = this._calculateExpectedHours(property);
+
     const allJobsToInsert: NewJob[] = events.map(event => ({
       ...context,
       checkInTime: event.start,
       checkOutTime: event.end,
       calendarEventUid: event.uid,
-      status: 'unassigned',
+      status: 'unassigned' as const,
       isUrgentBonus: false,
+      expectedHours: expectedHours.toString(),
+      addonsSnapshot: {
+        laundryType: property.laundryType,
+        laundryLoads: property.laundryLoads,
+        hotTubServiceLevel: property.hotTubServiceLevel,
+        hotTubDrainCadence: property.hotTubDrainCadence,
+      },
     }));
 
     let totalSynced = 0;
@@ -161,6 +209,8 @@ export class ICalService {
             set: {
               checkInTime: jobs.checkInTime,
               checkOutTime: jobs.checkOutTime,
+              expectedHours: jobs.expectedHours,
+              addonsSnapshot: jobs.addonsSnapshot,
             },
           })
           .returning({ id: jobs.id });

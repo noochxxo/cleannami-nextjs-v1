@@ -6,7 +6,7 @@ import { Subscriptions } from "@/components/dashbboard/admin/customer-management
 import { CustomerProperties } from "@/components/dashbboard/admin/customer-management/CustomerProperties";
 import { ClipboardListIcon, CreditCardIcon, DollarSign, House, SparkleIcon } from "lucide-react";
 import Link from "next/link";
-import { getCustomerDetails } from "@/lib/queries/customerQueries";
+import { getCustomerDetails } from "@/lib/queries/customers";
 
 
 // FIX: The dynamic parameter from the folder name '[id]' is `params.id`.
@@ -83,7 +83,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                 <th className="px-4 py-2 text-left font-medium text-gray-500">Status</th>
               </tr>
             </thead>
-            <JobHistory jobs={customerDetails.jobs} />
+            <JobHistory jobs={customerDetails.recentJobs} properties={customerDetails.properties} />
           </table>
         </div>
       </div>

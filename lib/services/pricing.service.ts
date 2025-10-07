@@ -37,7 +37,7 @@ type SubscriptionTier = 'one-month' | 'two-month' | 'three-month' | 'four-month'
 export type SelectedProducts = {
   subscriptionTier: SubscriptionTier;
   laundry: 'on-site' | 'off-site' | 'none';
-  hotTub: 'basic' | 'premium' | 'none';
+  hotTub: 'basic' | 'none';
 };
 
 export class PricingService {
@@ -48,7 +48,7 @@ export class PricingService {
     const sqftSurcharge = this._calculateSqftSurcharge(sqft);
     const laundryCost = this._calculateLaundryCost(formData);
     const hotTubCost = this._calculateHotTubCost(formData);
-    
+    // const hottubDrain = this._
     const isCustomQuote = sqft >= 3000;
     const totalPerClean = basePrice + sqftSurcharge + laundryCost.total + hotTubCost.total;
 
@@ -84,10 +84,9 @@ export class PricingService {
     return 'none';
   }
 
-  private _mapHotTubSelection(hasHotTub?: boolean, hotTubService?: string): 'basic' | 'premium' | 'none' {
+  private _mapHotTubSelection(hasHotTub?: boolean, hotTubService?: string): 'basic' | 'none' {
     if (!hasHotTub) return 'none';
     if (hotTubService === 'basic') return 'basic';
-    if (hotTubService === 'premium') return 'premium';
     return 'none';
   }
 
@@ -117,7 +116,7 @@ export class PricingService {
   }
 
   private _calculateHotTubCost(formData: SignupFormData): { total: number; periodic: PeriodicCharge[] } {
-    const { hasHotTub, hotTubService, hotTubDrainCadence } = formData;
+    const { hasHotTub, hotTubService, hotTubDrainCadence, hotTubDrain } = formData;
     if (!hasHotTub) return { total: 0, periodic: [] };
 
     let total = 0;
@@ -125,14 +124,15 @@ export class PricingService {
 
     if (hotTubService === 'basic') {
       total = HOT_TUB_BASIC_FEE;
-    } else if (hotTubService === 'premium') {
+    }
+    if (hotTubDrain) {
       periodic.push({
         description: "Hot Tub Full Drain & Refill",
         amount: HOT_TUB_FULL_DRAIN_FEE,
         cadence: hotTubDrainCadence,
       });
     }
-
     return { total, periodic };
   }
+  
 }

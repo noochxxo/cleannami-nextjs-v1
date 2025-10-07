@@ -35,7 +35,10 @@ export const subscriptions = pgTable(
     isFirstCleanPrepaid: boolean("is_first_clean_prepaid")
       .default(false)
       .notNull(),
-    startDate: date('start_date').notNull(),
+    iCalSyncFailed: boolean("ical_sync_failed").default(false),
+    lastSyncAttempt: timestamp("last_sync_attempt"),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },

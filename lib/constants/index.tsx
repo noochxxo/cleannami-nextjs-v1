@@ -1,4 +1,4 @@
-import { BadgeDollarSignIcon, ChartBarIcon, ClipboardListIcon, CogIcon, CreditCardIcon, House, LayoutDashboard, MailIcon, Shield, UserIcon, UsersIcon } from "lucide-react";
+import { BadgeDollarSignIcon, ChartBarIcon, ClipboardListIcon, CogIcon, CreditCardIcon, House, LayoutDashboard, LocateFixed, MailIcon, Shield, UserIcon, UsersIcon } from "lucide-react";
 
 
 export const APP_NAME =
@@ -45,30 +45,35 @@ export const PRIVATE_ADMIN_NAV_ROUTES = [
     label: "subscriptions",
     route: "/admin/subscriptions",
   },
+  // {
+  //   icon: <BadgeDollarSignIcon />,
+  //   label: "financials",
+  //   route: "/admin/financials",
+  // },
+  // {
+  //   icon: <Shield />,
+  //   label: "disputes",
+  //   route: "/admin/disputes",
+  // },
+  // {
+  //   icon: <ChartBarIcon />,
+  //   label: "reporting",
+  //   route: "/admin/reporting",
+  // },
+  // {
+  //   icon: <MailIcon />,
+  //   label: "notifications",
+  //   route: "/admin/notifications",
+  // },
+  // {
+  //   icon: <CogIcon />,
+  //   label: "settings & security",
+  //   route: "/admin/settings",
+  // },
   {
-    icon: <BadgeDollarSignIcon />,
-    label: "financials",
-    route: "/admin/financials",
-  },
-  {
-    icon: <Shield />,
-    label: "disputes",
-    route: "/admin/disputes",
-  },
-  {
-    icon: <ChartBarIcon />,
-    label: "reporting",
-    route: "/admin/reporting",
-  },
-  {
-    icon: <MailIcon />,
-    label: "notifications",
-    route: "/admin/notifications",
-  },
-  {
-    icon: <CogIcon />,
-    label: "settings & security",
-    route: "/admin/settings",
+    icon: <LocateFixed />,
+    label: "Geocode Addresses",
+    route: "/admin/geocode",
   },
 ];
 
