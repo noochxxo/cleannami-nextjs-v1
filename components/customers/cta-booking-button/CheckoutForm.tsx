@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { LoadingFallback } from '@/components/LoadingFallback';
 
 interface Props {
   onPaymentSuccess: (paymentIntentId: string) => void;
@@ -45,16 +46,20 @@ export const CheckoutForm = ({ onPaymentSuccess }: Props) => {
 
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
+      <Suspense fallback={<LoadingFallback message="Preparing Stripe" />}>
       <PaymentElement id="payment-element" options={{ layout: "tabs" }} />
-      <button 
+        <button 
         disabled={isLoading || !stripe || !elements} 
         id="submit"
-        className="w-full mt-6 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full mt-6 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:bg-brand/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <span id="button-text">
           {isLoading ? <div className="spinner" /> : "Confirm & Pay"}
         </span>
       </button>
+      </Suspense>
+      
+      
       
       {/* Show any error or success messages */}
       {message && <div id="payment-message" className="mt-2 text-sm text-red-600">{message}</div>}

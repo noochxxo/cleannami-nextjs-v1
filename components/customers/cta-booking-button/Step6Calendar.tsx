@@ -9,6 +9,7 @@ import {
 import React, { useState } from "react";
 import { StepFeedback } from "./StepFeedback";
 import { validateIcalUrl } from "@/lib/actions/validate-ical.actions";
+import { ICalInstructions } from "./ICalInstructions";
 
 type ValidationStatus =
   | "idle"
@@ -133,6 +134,7 @@ export const Step6Calendar = ({
           different states.
         </p>
       </div>
+      <ICalInstructions />
       <StepFeedback
         errors={errors}
         fields={["iCalUrl"]}

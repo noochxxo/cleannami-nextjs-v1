@@ -40,7 +40,7 @@ const CredentialsSignInForm = () => {
             required
             defaultValue={data?.data.email}
             autoComplete="email"
-            className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-3 text-gray-900 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+            className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-3 text-gray-900 shadow-sm focus:border-brand focus:ring-brand"
             placeholder="Email address"
           />
         </div>
@@ -60,7 +60,7 @@ const CredentialsSignInForm = () => {
             autoComplete="password"
             placeholder="Enter your password"
             required
-            className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-3 text-gray-900 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+            className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-3 text-gray-900 shadow-sm focus:border-brand focus:ring-brand"
           />
         </div>
       </div>
@@ -68,7 +68,7 @@ const CredentialsSignInForm = () => {
       <button
         type="submit"
         disabled={pending}
-        className="w-full justify-center rounded-lg bg-teal-500 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-teal-600 focus-visible:outline  focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+        className="w-full justify-center rounded-lg bg-brand px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand/60 focus-visible:outline  focus-visible:outline-offset-2 focus-visible:outline-brand"
       >
         {pending ? "Authenticating..." : "Login"}
       </button>

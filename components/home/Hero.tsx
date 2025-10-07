@@ -1,5 +1,5 @@
 
-import { BottomCTA } from "./BottomCTA";
+import { CTA } from "./CTA";
 
 export const Hero = () => {
   return (
@@ -17,10 +17,10 @@ export const Hero = () => {
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
           Effortless Vacation Rental Turnovers.
         </h1>
-        <p className="mt-4 mb-6 text-lg md:text-xl max-w-3xl mx-auto text-gray-200">
+        <p className="mt-4 mb-2 text-lg md:text-xl max-w-3xl mx-auto text-gray-200">
           CleanNami handles every detail of your vacation rental turnover — from linens and laundry to staging and hot tub care — so you can relax, impress guests, and always get five-star reviews.
         </p>
-        <BottomCTA />
+        <CTA />
       </div>
     </section>
   );

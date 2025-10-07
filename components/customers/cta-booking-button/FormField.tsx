@@ -31,7 +31,7 @@ export const FormField = ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className={`block w-full px-3 py-2 border text-gray-800 rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${error ? 'border-red-500' : 'border-gray-300'} focus:ring-teal-500 focus:border-teal-500`}
+      className={`block w-full px-3 py-2 border text-gray-800 rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${error ? 'border-red-500' : 'border-gray-300'} focus:ring-brand focus:border-brand`}
       required
     />
   </div>

@@ -1,6 +1,7 @@
 
-import { Features, BottomCTA, Hero } from "@/components/home";
+import { Features, Hero, CTA } from "@/components/home";
 import { FAQSection } from "@/components/home/FAQSection";
+import { PaymentTransparencyCard } from "@/components/home/PaymentTransparencyCard";
 import {
   Check,
   CircleDotDashedIcon,
@@ -15,7 +16,7 @@ export default function Home() {
       <main>
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-4xl md:text-6xl font-bold mb-4 text-brand/80">
               Turnovers on Autopilot
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-12">
@@ -24,7 +25,7 @@ export default function Home() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               <div className="flex flex-col items-center">
-                <div className="bg-teal-500 rounded-full p-5 mb-4">
+                <div className="bg-brand rounded-full p-5 mb-4">
                   <CircleDotDashedIcon className="h-10 w-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">
@@ -36,7 +37,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col items-center">
-                <div className="bg-teal-500 rounded-full p-5 mb-4">
+                <div className="bg-brand rounded-full p-5 mb-4">
                   <LinkIcon className="h-10 w-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">
@@ -48,7 +49,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col items-center">
-                <div className="bg-teal-500 rounded-full p-5 mb-4">
+                <div className="bg-brand rounded-full p-5 mb-4">
                   <Check className="h-10 w-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">
@@ -64,10 +65,11 @@ export default function Home() {
         </section>
 
         <Features />
+        <PaymentTransparencyCard />
 
-        <section className="py-20 bg-teal-500 text-white">
+        {/* <section className="py-20 text-white bg-gradient-to-r from-brand to-brand/50">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <h2 className="text-4xl md:text-6xl font-bold text-center mb-12">
               Trusted by Hosts Like You
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -99,11 +101,12 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         <FAQSection />
 
-        <BottomCTA />
+
+        <CTA title="Ready for Effortless Turnovers?" message="Get your no-obligation quote today." messageStyle="text-brand/60" titleStyle="text-brand/60"/>
       </main>
     </>
   );

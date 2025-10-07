@@ -14,9 +14,9 @@ export const FAQItem = ({ faq, isOpen, onToggle }: FAQItemProps) => (
     >
       <span>{faq.question}</span>
       {isOpen ? (
-        <ChevronUpIcon className="h-6 w-6 text-teal-500" />
+        <ChevronUpIcon className="h-6 w-6 text-brand" />
       ) : (
-        <ChevronDownIcon className="h-6 w-6 text-gray-400" />
+        <ChevronDownIcon className="h-6 w-6 text-brand" />
       )}
     </button>
     {isOpen && (

@@ -7,7 +7,7 @@ export const Features = () => {
     <section className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold">
+          <h2 className="text-4xl md:text-6xl text-brand/80 font-bold">
             The CleanNami Difference
           </h2>
         </div>
@@ -20,21 +20,21 @@ export const Features = () => {
                 add-ons and customer checklists integrated into the clean."
           />
           <FeatureCard
-            icon={<DollarSign />}
+            icon={<DollarSign className="h-8 w-8 text-white"/>}
             title="Consistent & Transparent Pricing"
             description="No haggling, no hidden fees. You see the exact price upfront —
                 based on your property details, laundry needs, and hot tub
                 options — and it stays the same every clean."
           />
           <FeatureCard
-            icon={<SparklesIcon />}
+            icon={<SparklesIcon className="h-8 w-8 text-white"/>}
             title="Turnkey Turnovers, Not Just Cleaning"
             description="Our cleaners don’t just scrub — they stage beds, restock
                 essentials already in your unit, reset hot tubs, and prepare
                 your property so guests feel like the very first check-in."
           />
           <FeatureCard
-            icon={<ShieldCheckIcon />}
+            icon={<ShieldCheckIcon className="h-8 w-8 text-white"/>}
             title="Reliability You Can Trust"
             description="Cleaners are GPS-verified at check-in and check-out. With
                 performance tracking and a dedicated on-call backup pool, your

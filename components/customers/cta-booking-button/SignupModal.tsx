@@ -9,7 +9,7 @@ export const SignupModal = () => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-75 transition-transform transform hover:scale-105"
+        className="px-6 py-3 bg-brand text-white font-semibold rounded-lg shadow-md hover:bg-brand/60 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-75 transition-transform transform hover:scale-105"
       >
         Start Your Subscription
       </button>

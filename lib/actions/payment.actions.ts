@@ -17,7 +17,6 @@ export async function createValidatedPaymentIntent(
   clientSideAmount: number
 ): Promise<{ clientSecret?: string | null; error?: string }> {
   try {
-    // This is the only line that needs to change
     const serverPriceDetails = await pricingService.calculatePrice(formData);
     const serverAmountInCents = Math.round(serverPriceDetails.totalPerClean * 100);
 

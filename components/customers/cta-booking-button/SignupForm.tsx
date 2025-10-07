@@ -299,7 +299,7 @@ export const SignupForm = ({ isOpen, onClose }: Props) => {
                 type="button"
                 onClick={prevStep}
                 disabled={currentStep === 1}
-                className={cn("py-2 px-4 rounded-md text-sm font-medium text-white bg-teal-600 hover:bg-teal-700", currentStep === 1 ? 'invisible': 'visible')}
+                className={cn("py-2 px-4 rounded-md text-sm font-medium text-white bg-brand hover:bg-brand/60", currentStep === 1 ? 'invisible': 'visible')}
               >
                 Back
               </button>
@@ -310,7 +310,7 @@ export const SignupForm = ({ isOpen, onClose }: Props) => {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="py-2 px-4 rounded-md text-sm font-medium text-white bg-teal-600 hover:bg-teal-700"
+                  className="py-2 px-4 rounded-md text-sm font-medium text-white bg-brand hover:bg-brand/60"
                 >
                   Next
                 </button>

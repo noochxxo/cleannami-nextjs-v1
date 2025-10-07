@@ -10,3 +10,4 @@ export * from './subscriptions.schema';
 export * from './relationships.schema';
 export * from './users.schema';
 export * from './pricing.schema';
+export * from './reserveTransactions.schema';

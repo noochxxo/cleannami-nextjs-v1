@@ -2,6 +2,21 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import localFont from 'next/font/local';
+
+
+
+const myFont = localFont({
+      src: [
+        {
+          path: '../../public/fonts/Arkhip_font.ttf',
+          weight: '400',
+          style: 'normal',
+        },
+      ],
+      variable: '--font-arkhip-font', // Optional: for use with Tailwind CSS
+      display: 'swap',
+    });
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,31 +26,34 @@ export const Header = () => {
       {/* The header container */}
       <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-sm shadow-sm">
         {/* Main header content */}
-        <div className="container mx-auto flex justify-between items-center p-4">
+        <div className="container mx-auto flex justify-between items-center p-4 ">
           <Link
             href="/"
-            className="text-3xl font-extrabold text-gray-800 tracking-tight"
+            className={`text-3xl font-extrabold ${myFont.className} antialiased text-brand/60 tracking-tight flex flex-row my-auto`}
           >
-            <span className="text-teal-500">Clean</span>Nami
+            {/* className="text-teal-500" */}
+            
+            <span className='text-brand' >Clean</span>Nami
+            
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
-              className="text-gray-600 hover:text-teal-500 font-medium transition-colors"
+              className="text-gray-600 hover:text-brand font-medium transition-colors"
             >
               Home
             </Link>
             <Link
               href="/about"
-              className="text-gray-600 hover:text-teal-500 font-medium transition-colors"
+              className="text-gray-600 hover:text-brand font-medium transition-colors"
             >
               About Us
             </Link>
             <Link
               href="/sign-in"
-              className="text-gray-600 hover:text-teal-500 font-medium transition-colors"
+              className="text-gray-600 hover:text-brand font-medium transition-colors"
             >
               Sign in
             </Link>

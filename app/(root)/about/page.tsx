@@ -1,5 +1,5 @@
 import { TeamMemberCard, ValueCard } from "@/components/about";
-import { BottomCTA } from "@/components/home";
+import { CTA } from "@/components/home";
 import { CpuIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
 
 export default function Page() {
@@ -94,7 +94,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="bg-gray-800 text-white">
+        <section className="bg-brand/50 text-white">
           <div className="container mx-auto px-4 py-16 text-center">
             <h2 className="text-3xl font-bold">
               Join the Automation Revolution
@@ -103,7 +103,7 @@ export default function Page() {
               Experience the peace of mind that comes with truly reliable
               turnovers.
             </p>
-            <BottomCTA />
+            <CTA />
           </div>
         </section>
       </main>
