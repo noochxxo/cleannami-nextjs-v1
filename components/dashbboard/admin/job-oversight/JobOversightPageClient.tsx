@@ -1,8 +1,6 @@
 'use client';
 
 import { RealTimeJobBoard } from "../RealTimeJobBoard";
-import { JobCalendarView } from "./JobCalendarView";
-import { JobListView } from "./JobListView";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
