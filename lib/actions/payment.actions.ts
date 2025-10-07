@@ -84,7 +84,9 @@ export async function createValidatedPaymentIntent(
         property_address: formData.address ?? 'N/A',
         property_details: `${formData.bedrooms} bed, ${formData.bathrooms} bath, ${formData.sqft ?? 'N/A'} sqft`,
         laundry_service: `${formData.laundryService} (${formData.laundryLoads ?? 0} loads)`,
-        hot_tub_service: formData.hasHotTub ? (formData.hotTubService ?? 'None Selected') : 'No Hot Tub',
+        hot_tub_service: formData.hasHotTub && "has hot tub" || '', 
+        hot_tub_drain: formData.hotTubDrain && "drain hot tub" || '',
+        hotTub_drain_cadence: formData.hotTubDrainCadence || '',
         subscription_term: `${formData.subscriptionMonths} month(s)`,
     };
 
