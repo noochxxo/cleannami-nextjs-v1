@@ -45,11 +45,11 @@ export const PRIVATE_ADMIN_NAV_ROUTES = [
     label: "subscriptions",
     route: "/admin/subscriptions",
   },
-  // {
-  //   icon: <BadgeDollarSignIcon />,
-  //   label: "financials",
-  //   route: "/admin/financials",
-  // },
+  {
+    icon: <BadgeDollarSignIcon />,
+    label: "Pricing",
+    route: "/admin/pricing",
+  },
   // {
   //   icon: <Shield />,
   //   label: "disputes",

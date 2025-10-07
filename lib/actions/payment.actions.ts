@@ -9,7 +9,6 @@ import { eq } from 'drizzle-orm';
 
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-// Instantiate the pricing service to use its logic on the server
 const pricingService = new PricingService();
 
 
@@ -18,7 +17,8 @@ export async function createValidatedPaymentIntent(
   clientSideAmount: number
 ): Promise<{ clientSecret?: string | null; error?: string }> {
   try {
-    const serverPriceDetails = pricingService.calculatePrice(formData);
+    // This is the only line that needs to change
+    const serverPriceDetails = await pricingService.calculatePrice(formData);
     const serverAmountInCents = Math.round(serverPriceDetails.totalPerClean * 100);
 
     if (serverAmountInCents !== clientSideAmount) {

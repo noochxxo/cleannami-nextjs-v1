@@ -7,7 +7,7 @@ export const jobStatusEnum = pgEnum('job_status', ['unassigned','assigned', 'in-
 
 export const jobCleanerRoleEnum = pgEnum('job_cleaner_role', ['primary', 'backup', 'on-call', 'laundry_lead']);
 
-export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'authorized', 'captured', 'failed']);
+export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'authorized', 'captured', 'failed', 'capture_failed']);
 
 export const jobs = pgTable('jobs', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -25,9 +25,11 @@ export const jobs = pgTable('jobs', {
     hotTubServiceLevel?: string | null;
     hotTubDrainCadence?: string | null;
   }>(),
+  
   paymentIntentId: text('payment_intent_id'),
   paymentStatus: paymentStatusEnum('payment_status'), // Use the enum defined above
   paymentFailed: boolean('payment_failed').default(false),
+  notes: text('notes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [

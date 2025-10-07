@@ -1,5 +1,4 @@
 "use client";
-import { PricingService } from "@/lib/services/pricing.service";
 import {
   PriceDetails,
   SignupFormData,
@@ -19,6 +18,7 @@ import { ProgressBar } from "./ProgressBar";
 import { PriceSummary } from "./PriceSummary";
 import { completeOnboarding } from "@/lib/actions/onboarding.actions";
 import { cn } from "@/lib/utils";
+import { getLivePrice } from "@/lib/actions/clientSidePricing.actions";
 
 const stepFields: Record<number, string[]> = {
   1: ["name", "email", "emailConfirm", "phoneNumber"],
@@ -98,15 +98,26 @@ export const SignupForm = ({ isOpen, onClose }: Props) => {
     {}
   );
 
-  const pricingService = useMemo(() => new PricingService(), []);
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    const details = pricingService.calculatePrice(formData);
+  const fetchPrice = async () => {
+    // The specific check for bedrooms and bathrooms has been removed.
+    const details = await getLivePrice(formData);
     setPriceDetails(details);
-  }, [formData, pricingService]);
+  };
+
+  const timerId = setTimeout(() => {
+    fetchPrice();
+  }, 500);
+
+  return () => {
+    clearTimeout(timerId);
+  };
+
+}, [JSON.stringify(formData)]); 
 
   // const validateStep = (step: number) => {
     

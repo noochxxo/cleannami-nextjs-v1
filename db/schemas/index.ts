@@ -9,3 +9,4 @@ export * from './properties.schema';
 export * from './subscriptions.schema';
 export * from './relationships.schema';
 export * from './users.schema';
+export * from './pricing.schema';

@@ -43,6 +43,13 @@
       "when": 1759807140041,
       "tag": "0005_clean_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1759819555428,
+      "tag": "0006_cold_sharon_ventura",
+      "breakpoints": true
     }
   ]
 }

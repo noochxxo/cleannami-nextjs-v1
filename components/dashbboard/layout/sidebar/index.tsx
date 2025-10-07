@@ -6,6 +6,7 @@ import { PRIVATE_ADMIN_NAV_ROUTES, PRIVATE_USER_NAV_ROUTES } from "@/lib/constan
 import Link from "next/link";
 import { Route } from "next";
 import { usePathname } from "next/navigation";
+import { PricingUploadModal } from "../../admin/ui/PricingUploadModal";
 
 export const Sidebar = () => {
   const { data: user } = useCurrentUser();
