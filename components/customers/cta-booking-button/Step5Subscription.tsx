@@ -1,5 +1,5 @@
 import { StepsProps } from "@/lib/validations/bookng-modal";
-import { SubscriptionCard } from "./SubscriptionCard";
+// import { SubscriptionCard } from "./SubscriptionCard";
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { addDays, format } from 'date-fns';
@@ -23,7 +23,7 @@ export const Step5Subscription = ({ formData, setFormData, errors }: StepsProps)
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900">
+        {/* <h3 className="text-lg font-medium text-gray-900">
           Select Subscription Term
         </h3>
         <p className="mt-1 text-sm text-gray-600">
@@ -38,7 +38,7 @@ export const Step5Subscription = ({ formData, setFormData, errors }: StepsProps)
               onSelect={handleTermSelect}
             />
           ))}
-        </div>
+        </div> */}
       </div>
       <div>
         <h3 className="text-lg font-medium text-gray-900">Select First Clean Date</h3>
