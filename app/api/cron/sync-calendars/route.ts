@@ -4,7 +4,6 @@ import { eq } from "drizzle-orm";
 import { ICalService } from "@/lib/services/iCal/ical.service";
 
 export async function GET(request: Request) {
-  // Verify cron secret to prevent unauthorized access
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { 
@@ -15,7 +14,6 @@ export async function GET(request: Request) {
   console.log('Starting automated calendar sync for all active subscriptions');
 
   try {
-    // Get all active subscriptions with their properties
     const activeSubscriptions = await db.query.subscriptions.findMany({
       where: eq(subscriptions.status, 'active'),
       with: {
@@ -34,10 +32,8 @@ export async function GET(request: Request) {
       errors: [] as Array<{ subscriptionId: string; error: string }>,
     };
 
-    // Process each subscription
     for (const subscription of activeSubscriptions) {
       try {
-        // Skip if no iCal URL
         if (!subscription.property?.iCalUrl) {
           console.log(`Skipping subscription ${subscription.id} - no iCal URL`);
           results.skipped++;
@@ -54,7 +50,6 @@ export async function GET(request: Request) {
           results.successful++;
           console.log(`✓ Synced subscription ${subscription.id}: ${result.totalSynced} jobs`);
           
-          // Clear error flag and update last sync attempt
           await db.update(subscriptions)
             .set({ 
               iCalSyncFailed: false,
@@ -69,7 +64,6 @@ export async function GET(request: Request) {
           });
           console.error(`✗ Failed to sync subscription ${subscription.id}: ${result.message}`);
 
-          // Flag subscription with sync error
           await db.update(subscriptions)
             .set({ 
               iCalSyncFailed: true,
@@ -86,7 +80,6 @@ export async function GET(request: Request) {
         });
         console.error(`✗ Exception syncing subscription ${subscription.id}:`, error);
 
-        // Flag subscription with sync error
         await db.update(subscriptions)
           .set({ 
             iCalSyncFailed: true,

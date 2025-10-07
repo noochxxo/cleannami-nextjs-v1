@@ -11,7 +11,6 @@ import { eq } from 'drizzle-orm';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const pricingService = new PricingService();
 
-
 export async function createValidatedPaymentIntent(
   formData: SignupFormData,
   clientSideAmount: number

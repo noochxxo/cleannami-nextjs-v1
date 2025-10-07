@@ -1,26 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
-import { jobs, evidencePackets } from '@/db/schemas';
-import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/db";
+import { jobs, evidencePackets } from "@/db/schemas";
+import { eq } from "drizzle-orm";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-     const { id } = await params;
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getClaims();
+    const user = data?.claims;
+    const userRole = user?.user_metadata?.role;
 
-    // Update job status and check-out time
+    if (userRole !== "admin" || userRole !== "super_admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+
     await db
       .update(jobs)
       .set({
-        status: 'completed',
+        status: "completed",
         checkOutTime: new Date(),
         updatedAt: new Date(),
       })
       .where(eq(jobs.id, id));
 
-    // Update GPS check-out timestamp in evidence packet if it exists
     await db
       .update(evidencePackets)
       .set({
@@ -31,21 +39,7 @@ export async function POST(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error checking out:', error);
-    return NextResponse.json(
-      { error: 'Failed to check out' },
-      { status: 500 }
-    );
+    console.error("Error checking out:", error);
+    return NextResponse.json({ error: "Failed to check out" }, { status: 500 });
   }
 }
-
-// import { NextRequest, NextResponse } from 'next/server';
-
-// export async function POST(
-//   request: NextRequest,
-// ) {
-//   return NextResponse.json(
-//       { error: 'Placeholder route' },
-//       { status: 500 }
-//     );
-// }

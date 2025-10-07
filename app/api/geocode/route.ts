@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { geocodeAllCleaners, geocodeAllProperties } from '@/lib/services/google-maps/geocoding';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
-    // Optional: Add authentication check
-    // const session = await getSession();
-    // if (session?.user?.role !== 'admin') {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getClaims();
+    const user = data?.claims;
+    const userRole = user?.user_metadata?.role;
 
-    const { target } = await request.json(); // 'cleaners', 'properties', or 'all'
+    if (userRole !== 'admin' || userRole !== 'super_admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { target } = await request.json();
 
     const results = {
       cleaners: { geocoded: 0, total: 0 },
@@ -46,7 +50,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Optional: GET endpoint to check status
 export async function GET(request: NextRequest) {
   const { db } = await import('@/db');
   const { cleaners, properties } = await import('@/db/schemas');

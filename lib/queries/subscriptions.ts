@@ -1,4 +1,4 @@
-// lib/queries/subscriptions.ts
+
 import 'server-only';
 import { db } from '@/db';
 import { subscriptions, properties, customers, jobs } from '@/db/schemas';
@@ -19,9 +19,6 @@ interface GetSubscriptionsParams extends PaginationParams, SearchParams {
   status?: SubscriptionStatus | 'all';
 }
 
-/**
- * Fetches paginated subscriptions with property, customer, and job data
- */
 export async function getSubscriptionsWithDetails({
   page = 1,
   limit = 10,
@@ -32,7 +29,6 @@ export async function getSubscriptionsWithDetails({
 
   const data = await db
     .select({
-      // Subscription fields
       id: subscriptions.id,
       customerId: subscriptions.customerId,
       propertyId: subscriptions.propertyId,
@@ -42,13 +38,12 @@ export async function getSubscriptionsWithDetails({
       firstCleanPaymentId: subscriptions.firstCleanPaymentId,
       isFirstCleanPrepaid: subscriptions.isFirstCleanPrepaid,
       startDate: subscriptions.startDate,
-      endDate: subscriptions.endDate,  // ADD THIS
-      iCalSyncFailed: subscriptions.iCalSyncFailed,  // ADD THIS
-      lastSyncAttempt: subscriptions.lastSyncAttempt,  // ADD THIS
+      endDate: subscriptions.endDate,
+      iCalSyncFailed: subscriptions.iCalSyncFailed,
+      lastSyncAttempt: subscriptions.lastSyncAttempt,
       createdAt: subscriptions.createdAt,
       updatedAt: subscriptions.updatedAt,
 
-      // Property info
       property: {
         id: properties.id,
         address: properties.address,
@@ -58,14 +53,12 @@ export async function getSubscriptionsWithDetails({
         laundryType: properties.laundryType,
       },
 
-      // Customer info
       customer: {
         id: customers.id,
         name: customers.name,
         email: customers.email,
       },
 
-      // Job statistics
       totalJobs: sql<number>`(
         SELECT CAST(COUNT(*) AS INTEGER)
         FROM ${jobs}
@@ -87,7 +80,6 @@ export async function getSubscriptionsWithDetails({
         AND ${jobs.checkInTime} > NOW()
       )`.as('upcoming_jobs'),
 
-      // Next scheduled job
       nextJobDate: sql<string | null>`(
         SELECT ${jobs.checkInTime}
         FROM ${jobs}
@@ -116,9 +108,6 @@ export async function getSubscriptionsWithDetails({
 
 export type SubscriptionsWithDetails = Awaited<ReturnType<typeof getSubscriptionsWithDetails>>;
 
-/**
- * Get detailed subscription information
- */
 export async function getSubscriptionDetails(subscriptionId: string) {
   const subscription = await db.query.subscriptions.findFirst({
     where: eq(subscriptions.id, subscriptionId),
@@ -127,7 +116,7 @@ export async function getSubscriptionDetails(subscriptionId: string) {
         with: {
           checklistFiles: {
             orderBy: (files, { desc }) => [desc(files.createdAt)],
-            limit: 1, // Get the most recent checklist
+            limit: 1,
           },
         },
       },
@@ -167,10 +156,8 @@ export async function getSubscriptionDetails(subscriptionId: string) {
     throw new Error('Subscription not found');
   }
 
-  // Calculate subscription metrics by status
   const now = new Date();
   
-  // Categorize jobs by status
   const upcomingJobs = subscription.jobs.filter(
     (j) => j.checkInTime && 
            new Date(j.checkInTime) > now && 
@@ -189,17 +176,14 @@ export async function getSubscriptionDetails(subscriptionId: string) {
 
   return {
     ...subscription,
-    // Next upcoming job
     nextJob: upcomingJobs[0] || null,
     
-    // Job lists by category
     upcomingJobs: upcomingJobs.slice(0, 10),
     inProgressJobs,
     completedJobs: completedJobs.slice(0, 20),
     canceledJobs: canceledJobs.slice(0, 10),
     unassignedJobs,
     
-    // Counts
     totalJobs: subscription.jobs.length,
     upcomingJobCount: upcomingJobs.length,
     inProgressJobCount: inProgressJobs.length,

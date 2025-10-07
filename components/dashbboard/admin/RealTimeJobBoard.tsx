@@ -98,6 +98,7 @@ export const RealTimeJobBoard = () => {
   );
 
   return (
+
     <>
       {isAdmin && (
         <div className="space-y-8">

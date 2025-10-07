@@ -1,4 +1,4 @@
-// lib/queries/properties.ts
+
 import 'server-only';
 import { db } from '@/db';
 import { properties, customers, subscriptions, jobs } from '@/db/schemas';
@@ -15,9 +15,6 @@ import {
 
 interface GetPropertiesParams extends PaginationParams, SearchParams {}
 
-/**
- * Fetches paginated properties with owner info and aggregated data
- */
 export async function getPropertiesWithOwner({
   page = 1,
   limit = 10,
@@ -27,7 +24,6 @@ export async function getPropertiesWithOwner({
 
   const data = await db
     .select({
-      // Property fields
       id: properties.id,
       customerId: properties.customerId,
       address: properties.address,
@@ -41,14 +37,12 @@ export async function getPropertiesWithOwner({
       createdAt: properties.createdAt,
       updatedAt: properties.updatedAt,
 
-      // Customer info
       customer: {
         id: customers.id,
         name: customers.name,
         email: customers.email,
       },
 
-      // Active subscription info
       activeSubscription: sql<{
         id: string;
         status: string;
@@ -68,7 +62,6 @@ export async function getPropertiesWithOwner({
         LIMIT 1
       )`.as('active_subscription'),
 
-      // Next scheduled job
       nextJob: sql<{
         id: string;
         checkInTime: string;
@@ -87,7 +80,6 @@ export async function getPropertiesWithOwner({
         LIMIT 1
       )`.as('next_job'),
 
-      // Job counts
       totalJobs: sql<number>`(
         SELECT CAST(COUNT(*) AS INTEGER)
         FROM ${jobs}
@@ -117,23 +109,18 @@ export async function getPropertiesWithOwner({
 
 export type PropertiesWithOwner = Awaited<ReturnType<typeof getPropertiesWithOwner>>;
 
-/**
- * Get comprehensive property details
- */
 export async function getPropertyDetails(propertyId: string) {
   const property = await db.query.properties.findFirst({
     where: eq(properties.id, propertyId),
     with: {
-      // Owner info
       customer: true,
 
-      // All subscriptions
       subscriptions: {
         orderBy: (subscriptions, { desc }) => [desc(subscriptions.createdAt)],
         with: {
           jobs: {
             orderBy: (jobs, { desc }) => [desc(jobs.createdAt)],
-            limit: 5, // Last 5 jobs per subscription
+            limit: 5,
             with: {
               cleaners: {
                 with: {
@@ -155,7 +142,6 @@ export async function getPropertyDetails(propertyId: string) {
         },
       },
 
-      // Checklist files
       checklistFiles: {
         orderBy: (files, { desc }) => [desc(files.createdAt)],
       },
@@ -166,13 +152,10 @@ export async function getPropertyDetails(propertyId: string) {
     notFound();
   }
 
-  // Find the active subscription
   const activeSubscription = property.subscriptions.find((s) => s.status === 'active');
 
-  // Get all jobs across all subscriptions
   const allJobs = property.subscriptions.flatMap((sub) => sub.jobs);
 
-  // Find next scheduled job
   const now = new Date();
   const upcomingJobs = allJobs
     .filter((j) => j.checkInTime && new Date(j.checkInTime) > now)

@@ -1,4 +1,3 @@
-// lib/services/geocoding.ts
 import { db } from '@/db';
 import { cleaners, properties } from '@/db/schemas';
 import { eq, isNull } from 'drizzle-orm';
@@ -49,7 +48,6 @@ export async function getCleanerCoordinates(cleanerId: string): Promise<Coordina
 
   if (!cleaner || !cleaner.address) return null;
 
-  // Return cached coordinates if available
   if (cleaner.latitude && cleaner.longitude) {
     return {
       latitude: parseFloat(cleaner.latitude),
@@ -57,7 +55,6 @@ export async function getCleanerCoordinates(cleanerId: string): Promise<Coordina
     };
   }
 
-  // Not cached - geocode now
   const coords = await geocodeAddress(cleaner.address);
   
   if (coords) {
@@ -74,7 +71,6 @@ export async function getCleanerCoordinates(cleanerId: string): Promise<Coordina
   return coords;
 }
 
-// geocodes if not cached
 export async function getPropertyCoordinates(propertyId: string): Promise<Coordinates | null> {
   const property = await db.query.properties.findFirst({
     where: eq(properties.id, propertyId),
@@ -88,7 +84,6 @@ export async function getPropertyCoordinates(propertyId: string): Promise<Coordi
 
   if (!property) return null;
 
-  // Return cached coordinates if available
   if (property.latitude && property.longitude) {
     return {
       latitude: parseFloat(property.latitude),
@@ -96,7 +91,6 @@ export async function getPropertyCoordinates(propertyId: string): Promise<Coordi
     };
   }
 
-  // Not cached - geocode now
   const coords = await geocodeAddress(property.address);
   
   if (coords) {
@@ -113,7 +107,6 @@ export async function getPropertyCoordinates(propertyId: string): Promise<Coordi
   return coords;
 }
 
-// useful if address changed
 export async function updateCleanerCoordinates(cleanerId: string): Promise<Coordinates | null> {
   const cleaner = await db.query.cleaners.findFirst({
     where: eq(cleaners.id, cleanerId),
@@ -138,7 +131,6 @@ export async function updateCleanerCoordinates(cleanerId: string): Promise<Coord
   return coords;
 }
 
-// useful if address changed
 export async function updatePropertyCoordinates(propertyId: string): Promise<Coordinates | null> {
   const property = await db.query.properties.findFirst({
     where: eq(properties.id, propertyId),
@@ -231,7 +223,6 @@ export async function geocodeAllProperties(
       onProgress(i + 1, propertiesToGeocode.length);
     }
     
-    // Rate limit: 50 requests per second
     await new Promise((resolve) => setTimeout(resolve, 20));
   }
 }

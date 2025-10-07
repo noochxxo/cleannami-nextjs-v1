@@ -15,12 +15,12 @@ export async function getJobStats() {
       totalJobs: aggregations.count(jobs.id),
       totalActive: aggregations.countWhere(
         jobs.id,
-        inArray(jobs.status, ['unassigned', 'assigned', 'in-progress'])  // ✅ Use inArray
+        inArray(jobs.status, ['unassigned', 'assigned', 'in-progress'])
       ),
       totalToday: aggregations.countWhere(
         jobs.id,
         and(
-          gte(jobs.checkInTime, today),  // ✅ Use Drizzle operators
+          gte(jobs.checkInTime, today),
           lt(jobs.checkInTime, tomorrow)
         )!
       ),

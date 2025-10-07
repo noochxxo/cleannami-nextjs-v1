@@ -9,26 +9,21 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const pricingService = new PricingService();
 
 export async function POST(req: NextRequest) {
-  // --- Step 1: Secure the endpoint ---
   const authToken = (req.headers.get("authorization") || "").split("Bearer ")[1];
   if (authToken !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // --- Step 2: Calculate the date range for "tomorrow" ---
   const now = new Date();
-  // Set to the start of tomorrow (midnight)
   const tomorrowStart = new Date(now);
   tomorrowStart.setDate(now.getDate() + 1);
   tomorrowStart.setHours(0, 0, 0, 0);
 
-  // Set to the start of the day after tomorrow (midnight)
   const dayAfterTomorrowStart = new Date(tomorrowStart);
   dayAfterTomorrowStart.setDate(tomorrowStart.getDate() + 1);
   
 
   try {
-    // --- Step 3: Find all jobs for tomorrow that haven't been processed ---
     const jobsToProcess = await db
       .select({
         jobId: jobs.id,
@@ -41,7 +36,6 @@ export async function POST(req: NextRequest) {
       .innerJoin(customers, eq(subscriptions.customerId, customers.id))
       .where(
         and(
-          // Correctly query the timestamp range for tomorrow
           gte(jobs.checkOutTime, tomorrowStart),
           lt(jobs.checkOutTime, dayAfterTomorrowStart),
           isNull(jobs.paymentIntentId)
@@ -52,7 +46,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "No jobs to process for tomorrow." });
     }
 
-    // --- Step 4: Process each job (rest of the code remains the same) ---
     const processingPromises = jobsToProcess.map(async (job) => {
       try {
         if (!job.stripeCustomerId) {

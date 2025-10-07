@@ -1,4 +1,3 @@
-// lib/queries/customers.ts
 import 'server-only';
 import { db } from '@/db';
 import { customers, properties, subscriptions, jobs } from '@/db/schemas';
@@ -15,10 +14,6 @@ import {
 
 interface GetCustomersParams extends PaginationParams, SearchParams {}
 
-/**
- * Fetches paginated customers with aggregated counts
- * Uses SQL subqueries for efficient counting
- */
 export async function getCustomersWithPropertyCount({
   page = 1,
   limit = 10,
@@ -28,7 +23,6 @@ export async function getCustomersWithPropertyCount({
 
   const data = await db
     .select({
-      // Customer fields
       id: customers.id,
       name: customers.name,
       email: customers.email,
@@ -37,7 +31,6 @@ export async function getCustomersWithPropertyCount({
       createdAt: customers.createdAt,
       updatedAt: customers.updatedAt,
 
-      // Aggregated counts using SQL subqueries
       propertyCount: sql<number>`(
         SELECT CAST(COUNT(*) AS INTEGER)
         FROM ${properties}
@@ -79,15 +72,10 @@ export async function getCustomersWithPropertyCount({
 
 export type CustomersResponse = Awaited<ReturnType<typeof getCustomersWithPropertyCount>>;
 
-/**
- * Get comprehensive customer details with all related data
- */
 export async function getCustomerDetails(customerId: string) {
-  // Fetch the customer with all relations in ONE query
   const customer = await db.query.customers.findFirst({
     where: eq(customers.id, customerId),
     with: {
-      // Get all properties with their subscriptions
       properties: {
         with: {
           subscriptions: {
@@ -96,7 +84,6 @@ export async function getCustomerDetails(customerId: string) {
           checklistFiles: true,
         },
       },
-      // Get all subscriptions with property details
       subscriptions: {
         with: {
           property: {
@@ -109,7 +96,7 @@ export async function getCustomerDetails(customerId: string) {
           },
           jobs: {
             orderBy: (jobs, { desc }) => [desc(jobs.createdAt)],
-            limit: 10, // Most recent 10 jobs per subscription
+            limit: 10,
             with: {
               cleaners: {
                 with: {
@@ -137,17 +124,15 @@ export async function getCustomerDetails(customerId: string) {
     notFound();
   }
 
-  // Aggregate job history across all properties
   const allJobs = customer.subscriptions.flatMap((sub) => sub.jobs);
 
   return {
     ...customer,
-    // Add computed fields
     totalProperties: customer.properties.length,
     activeSubscriptions: customer.subscriptions.filter((s) => s.status === 'active').length,
     totalJobs: allJobs.length,
     completedJobs: allJobs.filter((j) => j.status === 'completed').length,
-    // Flatten job history for easy display
+  
     recentJobs: allJobs
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 20),
@@ -156,10 +141,6 @@ export async function getCustomerDetails(customerId: string) {
 
 export type CustomerDetails = Awaited<ReturnType<typeof getCustomerDetails>>;
 
-/**
- * Get just the job history for a customer
- * (Can be used for infinite scroll pagination)
- */
 export async function getCustomerJobHistory({
   customerId,
   page = 1,
@@ -167,7 +148,6 @@ export async function getCustomerJobHistory({
 }: { customerId: string } & PaginationParams) {
   const offset = getPaginationOffset(page, limit);
 
-  // First get all property IDs for this customer
   const customerProperties = await db
     .select({ id: properties.id })
     .from(properties)
@@ -179,7 +159,6 @@ export async function getCustomerJobHistory({
 
   const propertyIds = customerProperties.map((p) => p.id);
 
-  // --- NEW CODE: EFFICIENTLY COUNT JOBS ---
   let totalJobsCount = 0;
   let completedJobsCount = 0;
 
@@ -195,9 +174,6 @@ export async function getCustomerJobHistory({
     totalJobsCount = jobCounts[0].total;
     completedJobsCount = jobCounts[0].completed;
   }
-  // --- END NEW CODE ---
-
-  // Get jobs for those properties
   const jobData = await db.query.jobs.findMany({
     where: inArray(jobs.propertyId, propertyIds),
     orderBy: (jobs, { desc }) => [desc(jobs.createdAt)],

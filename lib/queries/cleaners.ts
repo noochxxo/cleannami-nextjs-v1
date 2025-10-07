@@ -30,14 +30,12 @@ export async function getCleaners({
 }: GetCleanersParams) {
   const offset = getPaginationOffset(page, limit);
   
-  // Get first day of current month for "jobs this month" calculation
   const firstDayOfMonth = new Date();
   firstDayOfMonth.setDate(1);
   firstDayOfMonth.setHours(0, 0, 0, 0);
 
   const data = await db
     .select({
-      // Basic cleaner info
       id: cleaners.id,
       fullName: cleaners.fullName,
       email: cleaners.email,
@@ -48,7 +46,6 @@ export async function getCleaners({
       hasHotTubCert: cleaners.hasHotTubCert,
       createdAt: cleaners.createdAt,
       
-      // Aggregated data
       totalJobs: sql<number>`(
         SELECT CAST(COUNT(*) AS INTEGER)
         FROM ${jobsToCleaners}
@@ -103,7 +100,6 @@ export async function getCleanerById(cleanerId: string) {
   const cleaner = await db.query.cleaners.findFirst({
     where: eq(cleaners.id, cleanerId),
     with: {
-      // Get all jobs with full details
       jobs: {
         with: {
           job: {
@@ -124,9 +120,8 @@ export async function getCleanerById(cleanerId: string) {
           },
         },
         orderBy: (jobsToCleaners, { desc }) => [desc(jobsToCleaners.jobId)],
-        limit: 50, // Last 50 jobs
+        limit: 50,
       },
-      // Get payout history
       payouts: {
         with: {
           job: {
@@ -139,10 +134,9 @@ export async function getCleanerById(cleanerId: string) {
         orderBy: (payouts, { desc }) => [desc(payouts.createdAt)],
         limit: 50,
       },
-      // Get recent availability
       availabilities: {
         orderBy: (availability, { desc }) => [desc(availability.date)],
-        limit: 30, // Last 30 days
+        limit: 30,
       },
     },
   });

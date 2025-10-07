@@ -9,6 +9,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = req.headers.get("x-api-key");
+    
+    if (!apiKey || apiKey !== process.env.CLEANER_APP_API_KEY) {
+      return NextResponse.json(
+        { error: "Unauthorized: Invalid or missing API key" },
+        { status: 401 }
+      );
+    }
+
     const { jobId } = await req.json();
 
     if (!jobId) {
@@ -23,6 +32,7 @@ export async function POST(req: NextRequest) {
             customer: true,
           },
         },
+        property: true,
       },
     });
 
@@ -101,12 +111,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Calculate 2% reserve
     const capturedAmount = paymentIntent.amount;
-    const reserveAmount = Math.round(capturedAmount * 0.02); // 2% reserve
+    const reserveAmount = Math.round(capturedAmount * 0.02);
     const netAmount = capturedAmount - reserveAmount;
 
-    // Record reserve transaction
     await db.insert(reserveTransactions).values({
       jobId: jobId,
       paymentIntentId: job.paymentIntentId,
@@ -122,8 +130,6 @@ export async function POST(req: NextRequest) {
         updatedAt: new Date(),
       })
       .where(eq(jobs.id, jobId));
-
-     // Create payout records for each cleaner on the job
     const assignedCleaners = await db.query.jobsToCleaners.findMany({
       where: eq(jobsToCleaners.jobId, jobId),
       with: {
@@ -132,41 +138,43 @@ export async function POST(req: NextRequest) {
     });
 
     if (assignedCleaners.length === 0) {
-      return NextResponse.json(
-        { error: "No cleaners assigned to this job" },
-        { status: 400 }
-      );
+      console.warn(`No cleaners assigned to job ${jobId}`);
+      return NextResponse.json({
+        success: true,
+        message: "Payment captured but no cleaners assigned",
+        jobId: jobId,
+        capturedAmount: capturedAmount,
+        reserveAmount: reserveAmount,
+        netAmount: netAmount,
+        paymentIntentId: paymentIntent.id,
+        payoutsCreated: 0,
+      });
     }
 
     const expectedHours = parseFloat(job.expectedHours || "0");
-    const basePay = 17 * expectedHours;
+    const basePayPerCleaner = expectedHours * 17;
 
     const payoutPromises = assignedCleaners.map(async (assignment) => {
-      let laundryBonus = null;
-      let urgentBonus = null;
+      let totalPayout = basePayPerCleaner;
+      let laundryBonus: number | null = null;
+      let urgentBonus: number | null = null;
 
-      // Laundry bonus only for laundry_lead role
       if (assignment.role === "laundry_lead" && job.addonsSnapshot?.laundryLoads) {
         laundryBonus = job.addonsSnapshot.laundryLoads * 5;
+        totalPayout += laundryBonus;
       }
 
-      // Urgent bonus (you may want to split this or only give to primary)
       if (job.isUrgentBonus) {
-        // Option A: Give to all cleaners
         urgentBonus = 10;
-        
-        // Option B: Only primary gets it (uncomment if preferred)
-        // if (assignment.role === "primary") {
-        //   urgentBonus = 10;
-        // }
+        totalPayout += urgentBonus;
       }
 
       return db.insert(payouts).values({
         jobId: jobId,
         cleanerId: assignment.cleanerId,
-        amount: basePay.toFixed(2),
-        urgentBonusAmount: urgentBonus?.toFixed(2) || null,
-        laundryBonusAmount: laundryBonus?.toFixed(2) || null,
+        amount: totalPayout.toFixed(2),
+        urgentBonusAmount: urgentBonus ? urgentBonus.toFixed(2) : null,
+        laundryBonusAmount: laundryBonus ? laundryBonus.toFixed(2) : null,
         status: "pending",
       });
     });
@@ -184,17 +192,6 @@ export async function POST(req: NextRequest) {
       payoutsCreated: assignedCleaners.length,
     });
 
-
-    return NextResponse.json({
-      success: true,
-      message: "Payment captured successfully",
-      jobId: jobId,
-      capturedAmount: capturedAmount,
-      reserveAmount: reserveAmount,
-      netAmount: netAmount,
-      paymentIntentId: paymentIntent.id,
-    });
-
   } catch (error: any) {
     console.error("Job completion capture failed:", error);
     return NextResponse.json(
@@ -204,7 +201,86 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// =============================================================================
+// SETUP INSTRUCTIONS
+// =============================================================================
+
+/*
+1. Generate a secure API key:
+   Run in terminal:
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+2. Add to your .env file:
+   CLEANER_APP_API_KEY=your_generated_key_here
+
+3. Store the same key in your cleaner app's environment variables
+*/
+
+// =============================================================================
+// CLEANER APP INTEGRATION
+// =============================================================================
+
+/*
+In your cleaner mobile app, call this endpoint after job completion:
+
+Example using fetch:
+
+const completeJob = async (jobId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/jobs/complete-and-capture`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': process.env.CLEANER_APP_API_KEY, // Stored in app config
+      },
+      body: JSON.stringify({ jobId }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to complete job');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error completing job:', error);
+    throw error;
+  }
+};
+
+Example usage in cleaner app flow:
+
+1. Cleaner uploads all photos → evidencePackets.photoUrls populated
+2. Cleaner completes checklist → evidencePackets.isChecklistComplete = true
+3. Cleaner GPS checks out → evidencePackets.gpsCheckOutTimestamp set
+4. App updates evidencePackets.status = 'complete'
+5. App calls: await completeJob(jobId)
+6. Success response triggers cleaner notification: "Job complete! Payment processed."
+*/
+
+// =============================================================================
+// SECURITY NOTES
+// =============================================================================
+
+/*
+✅ API Key stored in environment variables (not hardcoded)
+✅ Key should be rotated periodically (every 6-12 months)
+✅ Evidence packet validation prevents premature capture
+✅ Only jobs with complete evidence can be captured
+✅ Job status prevents double-capture
+✅ All failures logged for admin review
+
+⚠️ Important:
+- Never commit .env file to version control
+- Store API key securely in cleaner app (use secure storage like react-native-keychain)
+- Consider rate limiting this endpoint if needed (e.g., max 100 requests/min per IP)
+*/
+
+// =============================================================================
 // HOW TO TRIGGER THIS ENDPOINT
+// =============================================================================
+
 /*
 In your cleaner app, when a job is completed:
 
@@ -216,9 +292,29 @@ In your cleaner app, when a job is completed:
    Body: { "jobId": "uuid-here" }
 
 This endpoint will:
- - Verify all evidence is complete
- - Capture the pre-authorized payment from customer
- - Calculate and track 2% reserve
- - Mark job as captured
- - Job is now ready for cleaner payout processing
+✅ Verify all evidence is complete
+✅ Capture the pre-authorized payment from customer
+✅ Calculate and track 2% reserve
+✅ Mark job as captured
+✅ Create payout records for all assigned cleaners with bonuses
+✅ Payouts are now ready for Stripe Connect transfers (separate process)
+*/
+
+// =============================================================================
+// PAYOUT SCHEMA - MATCHES YOUR EXISTING SCHEMA
+// =============================================================================
+
+/*
+✅ Your payouts schema uses numeric (decimal) fields:
+
+- amount: Total payout amount in dollars (e.g., "85.00")
+- urgentBonusAmount: $10 bonus if urgent (e.g., "10.00")
+- laundryBonusAmount: $5/load bonus if laundry lead (e.g., "15.00" for 3 loads)
+- status: 'pending', 'released', or 'held'
+
+The amount field stores: base pay + urgent bonus + laundry bonus
+Example: 4 hours * $17/hr = $68.00 base + $10 urgent = $78.00 total
+
+Next step: Create a separate endpoint or cron to process pending payouts
+via Stripe Connect transfers and update status to 'released'
 */

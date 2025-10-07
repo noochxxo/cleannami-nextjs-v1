@@ -13,8 +13,6 @@ export type AvailableCleanerWithDistance = {
   distance: number;
 };
 
-// lib/queries/cleaners-proximity.ts
-
 export async function getAvailableCleanersForProperty(
   propertyId: string,
   options?: {
@@ -35,7 +33,7 @@ export async function getAvailableCleanersForProperty(
     where: and(
       isNotNull(cleaners.latitude),
       isNotNull(cleaners.longitude),
-      isNotNull(cleaners.onCallStatus) // ✅ Filter out null status in query
+      isNotNull(cleaners.onCallStatus)
     ),
     columns: {
       id: true,
@@ -61,7 +59,7 @@ export async function getAvailableCleanersForProperty(
         id: cleaner.id,
         fullName: cleaner.fullName,
         reliabilityScore: cleaner.reliabilityScore,
-        onCallStatus: cleaner.onCallStatus!, // ✅ Now safe to use !
+        onCallStatus: cleaner.onCallStatus!,
         distance: Math.round(distance * 10) / 10,
       };
     })

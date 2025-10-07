@@ -23,9 +23,6 @@ interface GetJobsParams extends PaginationParams, SearchParams {
   cleanerId?: string;
 }
 
-/**
- * Fetches paginated jobs with all related details
- */
 export async function getJobsWithDetails({
   page = 1,
   limit = 10,
@@ -38,25 +35,14 @@ export async function getJobsWithDetails({
 }: GetJobsParams) {
   const offset = getPaginationOffset(page, limit);
 
-  // Build where conditions
   const whereConditions = [
     filters.byStatus(jobs.status, status),
     filters.byDateRange(jobs.checkInTime, startDate, endDate),
     propertyId ? eq(jobs.propertyId, propertyId) : undefined,
   ].filter(Boolean);
 
-  // const searchCondition = buildSearchCondition(query, [properties.address]);
-  // const [countResult] = await db
-  //   .select({ count: sql<number>`count(*)` })
-  //   .from(jobs)
-  //   .leftJoin(properties, eq(jobs.propertyId, properties.id))
-  //   .where(and(...whereConditions, searchCondition));
-
-  // const totalCount = Number(countResult?.count || 0);
-
   const data = await db
     .select({
-      // Job fields
       id: jobs.id,
       subscriptionId: jobs.subscriptionId,
       propertyId: jobs.propertyId,
@@ -68,7 +54,6 @@ export async function getJobsWithDetails({
       createdAt: jobs.createdAt,
       updatedAt: jobs.updatedAt,
 
-      // Property info
       property: {
         id: properties.id,
         address: properties.address,
@@ -78,14 +63,12 @@ export async function getJobsWithDetails({
         laundryType: properties.laundryType,
       },
 
-      // Subscription info
       subscription: {
         id: subscriptions.id,
         status: subscriptions.status,
         durationMonths: subscriptions.durationMonths,
       },
 
-      // Cleaners assigned (as JSON array)
       assignedCleaners: sql<Array<{
         id: string;
         fullName: string;
@@ -101,7 +84,6 @@ export async function getJobsWithDetails({
         WHERE ${jobsToCleaners.jobId} = ${jobs.id}
       )`.as('assigned_cleaners'),
 
-      // Evidence packet status
       evidencePacket: sql<{
         id: string;
         status: string;
@@ -118,7 +100,6 @@ export async function getJobsWithDetails({
         WHERE ${evidencePackets.jobId} = ${jobs.id}
       )`.as('evidence_packet'),
 
-      // Payout info
       totalPayout: sql<string>`(
         SELECT CAST(COALESCE(SUM(${payouts.amount}), 0) AS TEXT)
         FROM ${payouts}
@@ -145,7 +126,6 @@ export async function getJobsWithDetails({
     .limit(limit)
     .offset(offset);
 
-  // If filtering by cleaner, filter the results
   let filteredData = data;
   if (cleanerId) {
     filteredData = data.filter((job) =>
@@ -158,9 +138,6 @@ export async function getJobsWithDetails({
 
 export type JobsWithDetails = Awaited<ReturnType<typeof getJobsWithDetails>>;
 
-/**
- * Get comprehensive job details
- */
 export async function getJobDetails(jobId: string) {
   const job = await db.query.jobs.findFirst({
     where: eq(jobs.id, jobId),
@@ -210,7 +187,6 @@ export async function getJobDetails(jobId: string) {
     throw new Error('Job not found');
   }
 
-  // Calculate total payout
   const totalPayout = job.payouts.reduce((sum, p) => sum + parseFloat(p.amount), 0);
 
   return {
@@ -223,9 +199,6 @@ export async function getJobDetails(jobId: string) {
 
 export type JobDetails = Awaited<ReturnType<typeof getJobDetails>>;
 
-/**
- * Get jobs for calendar view (grouped by date)
- */
 export async function getJobsForCalendar({
   startDate,
   endDate,
@@ -257,7 +230,6 @@ export async function getJobsForCalendar({
     },
   });
 
-  // Group by date
   const jobsByDate: Record<string, typeof jobData> = {};
   
   jobData.forEach((job) => {
