@@ -142,13 +142,13 @@ export const SubscriptionDetailModal = ({
               )}
             </div>
 
-            <ToggleSwitch
+            {/* <ToggleSwitch
               label="Auto-renew at end of term"
               enabled={localSub.autoRenew}
               onChange={(enabled) => setLocalSub((prev) => ({ ...prev, autoRenew: enabled }))}
-            />
+            /> */}
 
-            <div>
+            {/* <div>
               <h3 className="text-base font-semibold text-gray-800 mb-3">Actions</h3>
               <div className="space-y-3">
                  
@@ -165,7 +165,7 @@ export const SubscriptionDetailModal = ({
                   <p className="text-sm text-center text-red-700 font-medium bg-red-50 p-3 rounded-md">This subscription is canceled.</p>
                 )}
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="p-6 border-t bg-gray-50 rounded-b-2xl flex justify-end items-center space-x-3">

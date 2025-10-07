@@ -13,8 +13,7 @@ export async function GET(
     const { data } = await supabase.auth.getClaims();
     const user = data?.claims;
     const userRole = user?.user_metadata?.role;
-
-    if (userRole !== "admin" || userRole !== "super_admin") {
+    if (userRole !== "admin" && userRole !== "super_admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

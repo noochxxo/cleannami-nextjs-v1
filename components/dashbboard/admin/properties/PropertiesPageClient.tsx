@@ -58,10 +58,10 @@ export const PropertiesPageClient = () => {
      <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <SearchBar onSearch={setSearchTerm} placeholder="Search by address or owner..." />
-          <button className="w-full md:w-auto flex items-center justify-center bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600">
+          {/* <button className="w-full md:w-auto flex items-center justify-center bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600">
             <PlusIcon className="mr-2 h-5 w-5" />
             Add Property
-          </button>
+          </button> */}
         </div>
         
         <div className="bg-white rounded-lg shadow-md overflow-hidden">

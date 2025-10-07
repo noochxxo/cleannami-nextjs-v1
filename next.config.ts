@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'ymccorozcd.ufs.sh',
+      },
     ],
   },
   typedRoutes: true,

@@ -1,5 +1,4 @@
 "use client";
-import { cleaners, jobs, JobStatus, properties } from "@/data/adminMockData";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -9,7 +8,8 @@ import { useMemo, useState } from "react";
 import { getStatusBadge } from "../../utils";
 import { Route } from "next";
 import Link from "next/link";
-import { formatDate } from "date-fns";
+import { jobs } from "@/db/schemas";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 type SortDirection = "ascending" | "descending";
 type SortableKey =
@@ -24,7 +24,49 @@ interface SortConfig {
   direction: SortDirection;
 }
 
+async function fetchJobs({ pageParam = 1 }: { pageParam: number }) {
+  const res = await fetch(`/api/jobs?page=${pageParam}`);
+  if (!res.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const result: GetJobsResponse = await res.json();
+  return {
+    jobs: result.data,
+    nextPage: result.nextPage,
+  };
+}
+
 export const JobListView = () => {
+
+  const { data: user } = useCurrentUser();
+    const isAdmin =
+      user?.user_metadata.role === "admin" ||
+      user?.user_metadata.role === "super_admin";
+
+    const { data: stats } = useQuery({
+        queryKey: ["jobs", "stats"],
+        queryFn: async () => {
+          const res = await fetch("/api/jobs/stats");
+          if (!res.ok) throw new Error("Failed to fetch stats");
+          return res.json() as Promise<GetJobStatsResponse>;
+        },
+        refetchInterval: 30000,
+      });
+  const {
+      data,
+      error,
+      fetchNextPage,
+      hasNextPage,
+      isFetching,
+      isFetchingNextPage,
+      status,
+    } = useInfiniteQuery({
+      queryKey: ["jobs"],
+      queryFn: fetchJobs,
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+    });
+
   const [activeFilter, setActiveFilter] = useState<
     JobStatus | "All" | "Flagged"
   >("All");

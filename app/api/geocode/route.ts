@@ -1,16 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { geocodeAllCleaners, geocodeAllProperties } from '@/lib/services/google-maps/geocoding';
-import { createClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  geocodeAllCleaners,
+  geocodeAllProperties,
+} from "@/lib/services/google-maps/geocoding";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = await createClient();
     const { data } = await supabase.auth.getClaims();
     const user = data?.claims;
     const userRole = user?.user_metadata?.role;
 
-    if (userRole !== 'admin' || userRole !== 'super_admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (userRole !== "admin" && userRole !== "super_admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { target } = await request.json();
@@ -20,16 +23,16 @@ export async function POST(request: NextRequest) {
       properties: { geocoded: 0, total: 0 },
     };
 
-    if (target === 'cleaners' || target === 'all') {
-      console.log('Geocoding cleaners...');
+    if (target === "cleaners" || target === "all") {
+      console.log("Geocoding cleaners...");
       await geocodeAllCleaners((current, total) => {
         results.cleaners = { geocoded: current, total };
         console.log(`Cleaners: ${current}/${total}`);
       });
     }
 
-    if (target === 'properties' || target === 'all') {
-      console.log('Geocoding properties...');
+    if (target === "properties" || target === "all") {
+      console.log("Geocoding properties...");
       await geocodeAllProperties((current, total) => {
         results.properties = { geocoded: current, total };
         console.log(`Properties: ${current}/${total}`);
@@ -39,24 +42,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       results,
-      message: 'Geocoding complete',
+      message: "Geocoding complete",
     });
   } catch (error) {
-    console.error('Geocoding error:', error);
+    console.error("Geocoding error:", error);
     return NextResponse.json(
-      { error: 'Failed to geocode addresses', details: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: "Failed to geocode addresses",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }
 }
 
 export async function GET(request: NextRequest) {
-  const { db } = await import('@/db');
-  const { cleaners, properties } = await import('@/db/schemas');
-  const { isNull } = await import('drizzle-orm');
+  const { db } = await import("@/db");
+  const { cleaners, properties } = await import("@/db/schemas");
+  const { isNull } = await import("drizzle-orm");
 
   try {
-    const [cleanersWithoutCoords, propertiesWithoutCoords, cleanersWithCoords, propertiesWithCoords] = await Promise.all([
+    const [
+      cleanersWithoutCoords,
+      propertiesWithoutCoords,
+      cleanersWithCoords,
+      propertiesWithCoords,
+    ] = await Promise.all([
       db.query.cleaners.findMany({
         where: isNull(cleaners.latitude),
         columns: { id: true },
@@ -76,21 +87,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       cleaners: {
         total: cleanersWithCoords.length,
-        geocoded: cleanersWithCoords.filter(c => c.latitude).length,
+        geocoded: cleanersWithCoords.filter((c) => c.latitude).length,
         remaining: cleanersWithoutCoords.length,
       },
       properties: {
         total: propertiesWithCoords.length,
-        geocoded: propertiesWithCoords.filter(p => p.latitude).length,
+        geocoded: propertiesWithCoords.filter((p) => p.latitude).length,
         remaining: propertiesWithoutCoords.length,
       },
     });
   } catch (error) {
-    console.error('Error fetching geocode status:', error);
+    console.error("Error fetching geocode status:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch status' },
+      { error: "Failed to fetch status" },
       { status: 500 }
     );
   }
 }
-

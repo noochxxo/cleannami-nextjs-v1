@@ -1,5 +1,6 @@
 'use client';
 
+import { RealTimeJobBoard } from "../RealTimeJobBoard";
 import { JobCalendarView } from "./JobCalendarView";
 import { JobListView } from "./JobListView";
 import Link from "next/link";
@@ -44,8 +45,9 @@ export function JobOversightPageClient() {
         </Link>
       </div>
       <div>
-        {view === "list" && <JobListView />}
-        {view === "calendar" && <JobCalendarView />}
+        <RealTimeJobBoard />
+        {/* {view === "list" && <JobListView />} */}
+        {/* {view === "calendar" && <JobCalendarView />} */}
         {/* {view === "swaps" && <SwapRequestsView onSelectJob={onSelectJob} />} */}
       </div>
     </div>
