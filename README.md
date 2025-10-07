@@ -2,6 +2,21 @@
 
 ## Getting Started
 
+### Create admin account
+  - sign up and create an acount
+  - find your auth id
+  - replace the id in the example with yours
+  - run this command
+  ```sql
+    UPDATE auth.users
+    SET raw_user_meta_data = raw_user_meta_data || '{"role": "super_admin"}'::jsonb
+    WHERE id = '0c8fd1d5-5472-4e35-8e98-7b743b415ad6';
+
+    UPDATE users
+    SET role = 'super_admin'
+    WHERE supabase_user_id = '0c8fd1d5-5472-4e35-8e98-7b743b415ad6';
+  ```
+
 The admin dashboards are not complete but enough is done to see
 what you data.
 
