@@ -1,7 +1,7 @@
 import { Header } from "@/components/home/Header";
 import Link from "next/link";
-import Logo from "../../public/IMG_3116.png";
 import Image from "next/image";
+import { Logo } from "@/lib/constants";
 
 export default function Layout({
   children,

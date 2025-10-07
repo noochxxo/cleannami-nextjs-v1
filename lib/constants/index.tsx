@@ -1,6 +1,6 @@
-import { BadgeDollarSignIcon, ChartBarIcon, ClipboardListIcon, CogIcon, CreditCardIcon, House, LayoutDashboard, LocateFixed, MailIcon, Shield, UserIcon, UsersIcon } from "lucide-react";
+import { BadgeDollarSignIcon, ClipboardListIcon, CreditCardIcon, House, LayoutDashboard, LocateFixed, UserIcon, UsersIcon } from "lucide-react";
 
-
+export const Logo = "https://ymccorozcd.ufs.sh/f/CFfiFeS2XelzZy5o0ZubBmJY75j80sif9WEVdIAGnpCtTSqr"
 export const APP_NAME =
   "CleanNami - Professional Cleaning Services | Florida Coast";
 export const APP_DESCRIPTION =
