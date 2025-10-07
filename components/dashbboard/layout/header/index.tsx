@@ -6,6 +6,23 @@ import { BellIcon, ChevronDownIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 
+function prettifyPath(path: string) {
+  // A regular expression to check if a string is a UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  return path
+    .split('/') // Split the string by the slash
+    .filter(Boolean) // Remove empty parts from the start
+    .filter(part => !uuidRegex.test(part)) // Filter out any parts that are UUIDs
+    .map(part =>
+      part
+        .split('-') // Handle kebab-case by splitting by hyphen
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+        .join(' ')
+    )
+    .join(' '); // Join the final parts with a space
+}
+
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -15,7 +32,7 @@ export const Header = () => {
   return (
     <header className="w-full h-20 bg-white border-b border-gray-200 flex md:items-center justify-end md:justify-between px-0 md:px-8">
       <div id="header-content-slide">
-        <h2 className="text-xl font-semibold text-gray-800 transition-all duration-300 hidden md:block">{activePage}</h2>
+        <h2 className="text-xl font-semibold text-gray-800 transition-all duration-300 hidden md:block">{prettifyPath(activePage)}</h2>
       </div>
       <div className="flex items-center space-x-6">
         <button className="text-gray-500 hover:text-gray-700 relative">

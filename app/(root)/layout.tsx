@@ -1,3 +1,5 @@
+
+import { Header } from "@/components/home/Header";
 import Link from "next/link";
 
 export default function Layout({
@@ -6,38 +8,8 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="bg-white text-gray-800 antialiased pb-5">
-      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-sm shadow-sm">
-        <div className="container mx-auto flex justify-between items-center p-4">
-          <Link
-            href="/"
-            className="text-3xl font-extrabold text-gray-800 tracking-tight"
-          >
-            <span className="text-teal-500">Clean</span>Nami
-          </Link>
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              href="/"
-              className="text-gray-600 hover:text-teal-500 font-medium transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              href="/about"
-              className="text-gray-600 hover:text-teal-500 font-medium transition-colors"
-            >
-              About Us
-            </Link>
-            <Link
-              href="/sign-in"
-              className="text-gray-600 hover:text-teal-500 font-medium transition-colors"
-            >
-              Sign in
-            </Link>
-          </nav>
-        </div>
-      </header>
-
+  <div className="bg-white text-gray-800 antialiased pb-5">
+      <Header />
       {children}
 
       <footer className="bg-gray-900 text-gray-400 py-12">
