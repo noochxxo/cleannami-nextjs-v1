@@ -122,7 +122,7 @@ export const PaymentTransparencyCard = () => {
             ))}
           </div>
         </div>
-
+{/*
         <div className="p-6 sm:p-10">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
             How We Calculate Pricing
@@ -155,7 +155,7 @@ export const PaymentTransparencyCard = () => {
             ))}
           </div>
         </div>
-
+*/}
         <div className="p-6 sm:p-8 bg-gray-800 rounded-b-xl text-center">
           <p className="text-sm text-gray-400">
             All payments are processed securely using{" "}
