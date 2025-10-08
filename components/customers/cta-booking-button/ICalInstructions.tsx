@@ -11,14 +11,14 @@ export const ICalInstructions = () => {
 
 
 <a href="https://help.vrbo.com/articles/Export-your-reservation-calendar" target="_blank" rel="noopener noreferrer">
-<h4 className="font-bold text-base text-gray-800 mt-2">
+<h4 className="font-bold text-base underline text-brand mt-2">
   Vrbo Help: How to Export Your Reservation Calendar
 
 </h4>
 </a>
 
 <a href="https://www.airbnb.ca/help/article/99" target="_blank" rel="noopener noreferrer">
-<h4 className="font-bold text-base text-gray-800 mt-2">
+<h4 className="font-bold text-base underline text-brand mt-2">
   Airbnb Help: How to Import/Export Your Calendar
 </h4>
 </a>
