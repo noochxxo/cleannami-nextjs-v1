@@ -1,4 +1,5 @@
 
+
 export const ICalInstructions = () => {
   return (
     <div className="max-w-xl mx-auto p-4 md:p-6 bg-white shadow-lg rounded-xl">
@@ -7,6 +8,24 @@ export const ICalInstructions = () => {
           Where do I find this? The iCal/ICS link allows for a read-only
           subscription to your calendar.
         </p>
+
+
+<a href="https://help.vrbo.com/articles/Export-your-reservation-calendar" target="_blank" rel="noopener noreferrer">
+<h4 className="font-bold text-base text-gray-800 mt-2">
+  Vrbo Help: How to Export Your Reservation Calendar
+
+</h4>
+</a>
+
+<a href="https://www.airbnb.ca/help/article/99" target="_blank" rel="noopener noreferrer">
+<h4 className="font-bold text-base text-gray-800 mt-2">
+  Airbnb Help: How to Import/Export Your Calendar
+</h4>
+</a>
+
+         
+        
+
 
         <h4 className="font-bold text-base text-gray-800 mt-2">
           Google Calendar (Desktop Recommended)
