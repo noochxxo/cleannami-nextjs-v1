@@ -6,9 +6,14 @@ import { addDays, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { StepFeedback } from "./StepFeedback";
 
+const LAUNCH_DATE = new Date('2025-10-21');
+const sevenDaysFromNow = addDays(new Date(), 7);
 
+const firstAvailableDay = sevenDaysFromNow < LAUNCH_DATE 
+  ? LAUNCH_DATE 
+  : sevenDaysFromNow;
 
-const firstAvailableDay = addDays(new Date(), 7);
+// const firstAvailableDay = addDays(new Date(), 7);
 
 export const Step5Subscription = ({ formData, setFormData, errors }: StepsProps) => {
   // const handleTermSelect = (months: number) =>
