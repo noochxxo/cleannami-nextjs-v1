@@ -6,7 +6,7 @@ import { addDays, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { StepFeedback } from "./StepFeedback";
 
-const LAUNCH_DATE = new Date('2025-10-21');
+const LAUNCH_DATE = new Date('2025-10-22');
 const sevenDaysFromNow = addDays(new Date(), 7);
 
 const firstAvailableDay = sevenDaysFromNow < LAUNCH_DATE 
