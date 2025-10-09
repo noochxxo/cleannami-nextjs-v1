@@ -48,7 +48,7 @@ export const Step5Subscription = ({ formData, setFormData, errors }: StepsProps)
       <div>
         <h3 className="text-lg font-medium text-gray-900">Select First Clean Date</h3>
         <p className="mt-1 text-sm text-gray-600">
-          To ensure cleaner availability, there is a mandatory 7-day buffer before your first turnover can be scheduled.
+          To ensure cleaner availability, there is a mandatory 7-day buffer before your first turnover can be scheduled. October 21st is our first available date. We&apos;ll contact you with a welcome call.
         </p>
         <div className="mt-4 flex flex-col gap-8 items-start">
             <DayPicker
