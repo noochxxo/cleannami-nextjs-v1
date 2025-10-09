@@ -21,8 +21,7 @@ export const Step8Confirmation = () => {
               What&apos;s Next?
             </h4>
             <p className="text-left text-sm text-gray-600">
-              We&apos;ll monitor your iCal and automatically schedule your first
-              turnover.
+              We&apos;ll monitor your iCal and automatically schedule your turnovers starting October 21st. We&apos;ll call you after booking to welcome you!
             </p>
           </div>
         </div>
